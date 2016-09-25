@@ -1,7 +1,15 @@
 angular.module('main.services', [])
 
-.factory('General', function() {
+.factory('General', function(localStorageService) {
     return {
+        /**
+         * Empties all cached data.
+         * 
+         * @author - Albert Deng
+         */
+        clearAll: function() {
+            localStorageService.clearAll();
+        },
         /** 
          * Generates a random number between the min and max range. If the range 
          * is undefined, then it will generate a number between 0 and 10,000, 
@@ -44,12 +52,118 @@ angular.module('main.services', [])
     }
 })
 
+.factory('Accounting', function($q, $http, localStorageService) {
+    /**
+     * Checks the local storage for the chart of accounts. If chart of 
+     * accounts data does not exist, refresh the localStorage with the data
+     * from the JSON file. 
+     * 
+     * @warning - If the chart of accounts data is not in local storage, may return null
+     * 
+     * @author - Albert Deng
+     * @return - {Object} The chart of accounts data
+     */
+    function getChartOfAccounts() {
+        if(localStorageService.get('accounts') == null) {
+            refreshChartOfAccounts();
+        }
+        return JSON.parse(localStorageService.get('accounts'));
+    }
+
+    /**
+     * Download the chart of accounts data from the json file into local storage.
+     * Return a promise containing the chart of accounts data.
+     * 
+     * @author - Albert Deng
+     * @return - {Promise} A promise that resolves to the chart of accounts data
+     */
+    function refreshChartOfAccounts() {
+        var deferred = $q.defer();
+        $http.get('/data/accounts.json').success( function(data) {
+            deferred.resolve(data);
+            localStorageService.set('accounts', JSON.stringify(data));
+        })
+        return deferred.promise;
+    }
+
+    /**
+     * Fetches and returns the general ledger object from storage. If the object
+     * does not exist, then the function will create it.
+     * 
+     * @author - Albert Deng
+     * @return - {Object} The general ledger object 
+     */
+    function getBooks() {
+        if(localStorageService.get('generalledger') == null) {
+            var a = [];
+            localStorageService.set('generalledger', JSON.stringify(a));
+        }
+        return JSON.parse(localStorageService.get('generalledger'));
+    }
+
+    return {
+        /**
+         * Adds the given value to the accounting ledger. Also subtracts if the 
+         * value is negative.
+         * 
+         * @param - {account} The GL code for the account to add value to
+         * @param - {value} The amount to add into the account
+         * @author - Albert Deng
+         */
+        addValue: function(account, value) {
+            var books = getBooks();
+            
+            // Force the account to an int, just in case the programmer forgot
+            account = parseInt(account); 
+
+            if(books[account] == undefined) {
+                books[account] = value;
+            } else {
+                books[account] += value;
+            }
+        },
+        /** 
+         * Creates a journal entry from the provided debits and credits. Function 
+         * has support for multiple debits and multiple credits; to insert multiple
+         * debits or credits, pass them as arrays of transaction objects.
+         * 
+         * A transaction object has the given form: [account, value]
+         * 
+         * @author - Albert Deng
+         * @param - {debits} Either an array of transactions or a single transaction
+         * @param - {credits} Either an array of transactions or a single transaction
+         */
+        makeJournalEntry: function(debits, credits) {
+            // Check if the debits and credits arrays are multidimensional
+            var multiDebits = debits[0][0] != undefined;
+            var multiCredits = credits[0][0] != undefined;
+
+            for(var i = 1; i < debits.length && multiDebits; i++) {
+                addValue(debits[i][0], debits[i][1]);
+            }
+
+            for(var j = 1; j < credits.length && multiCredits; j++) {
+                addValue(credits[i][0], credits[i][1]);
+            }
+
+            // Account for debit at index 0, or only debit if not multidimensional
+            var extraDebit = multiDebits ? debits[0] : debits;
+            addValue(extraDebit[i][0], extraDebit[i][1]);
+
+            
+            // Account for credit at index 0, or only credit if not multidimensional
+            var extraCredit = multiCredits ? credits[0] : credits;
+            addValue(extraCredit[i][0], extraCredit[i][1]);
+        }
+    }
+})
+
 .factory('Inventory', function(localStorageService) {
     /**
      * Fetches and returns the inventory object from storage.
      * 
      * @author - Albert Deng
-     * @return - {String} A string representation of the inventory object
+     * @return - {Object} The inventory object
      */
     function getInventoryObj() {
         // If inventory does not exist, create it
@@ -57,7 +171,7 @@ angular.module('main.services', [])
             var a = [];
             localStorageService.set('inventory', JSON.stringify(a));
         }
-        return localStorageService.get('inventory');
+        return JSON.parse(localStorageService.get('inventory'));
     }
 
     /**
@@ -68,7 +182,7 @@ angular.module('main.services', [])
      */
     function calculateInventoryValue() {
         // Replace this logic if you decide to do inventory costing methods
-        var invObj = JSON.parse(getInventoryObj());
+        var invObj = getInventoryObj();
         var invValue = 0;
         for(var i = 0; i < invObj.length; i++) {
             invValue += (invObj[i]['units'] * invObj[i]['cost']);
@@ -88,7 +202,7 @@ angular.module('main.services', [])
          * @return - {Number} The value of inventory 
          */
         buyInventory: function(units, price) {
-            var invObj = JSON.parse(getInventoryObj());
+            var invObj = getInventoryObj();
             var obj = {
                 'units': units,
                 'cost': price
@@ -115,7 +229,7 @@ angular.module('main.services', [])
          * @return - {Number} The number of units of inventory
          */
         getInventoryUnits: function() {
-            var invObj = JSON.parse(getInventoryObj());
+            var invObj = getInventoryObj();
             var invUnits = 0;
             for(var i = 0; i < invObj.length; i++) {
                 invUnits += invObj[i]['units'];

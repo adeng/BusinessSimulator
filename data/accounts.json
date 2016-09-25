@@ -1,0 +1,19 @@
+{
+    "1001": "Cash",
+    "1011": "Accounts Receivable",
+    "1012": "Allowance for Doubtful Accounts",
+    "1013": "Short-Term Notes Receivable",
+    "1021": "Short-Term Investments - Trading",
+    "1022": "Short-Term Investments - AFS",
+    "1023": "Short-Term Investments - HTM",
+    "1031": "Merchandise Inventory",
+    "1032": "Materials Inventory",
+    "1033": "Work-In-Process Inventory",
+    "2001": "Accounts Payable",
+    "3001": "Common Stock",
+    "3002": "Retained Earnings",
+    "5001": "Sales Revenue",
+    "6001": "Cost of Goods Sold",
+    "9001": "Gain",
+    "9002": "Loss"
+}

@@ -1,6 +1,9 @@
 angular.module('main.controllers', [])
 
 .controller('GlobalCtrl', function($scope, $rootScope, $interval, General) {
+    // Disable this on live production
+    General.clearAll();
+
     /* Side Pane Code */
 	$scope.splitViewElement = document.getElementById("splitView");
     window.onresize = setPane;
@@ -14,16 +17,6 @@ angular.module('main.controllers', [])
 	$scope.hidePane = function() {
 		$scope.splitViewObject.closePane();
 	}
-
-    /**
-     * Rootscope wrapper for General accounting formatting method.
-     * 
-     * @author - Albert Deng
-     * @param - {num} The number to format
-     */
-    $rootScope.formatInt = function(num) {
-        return General.formatAccountingInt(num);
-    }
     
     /**
      * Set the document splitview display mode based on the document's width.
@@ -73,6 +66,18 @@ angular.module('main.controllers', [])
         $interval.cancel(stop);
         runTime = false;
         stop = undefined;
+    }
+
+    /* RootScope Wrappers */
+    
+    /**
+     * Rootscope wrapper for General accounting formatting method.
+     * 
+     * @author - Albert Deng
+     * @param - {num} The number to format
+     */
+    $rootScope.formatInt = function(num) {
+        return General.formatAccountingInt(num);
     }
 })
 
