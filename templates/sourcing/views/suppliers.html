@@ -1,0 +1,35 @@
+<style>
+    .body-subitem {
+        background-color: #E9E9E9;
+        padding: 10px;
+    }
+
+    .body-subitem p {
+        margin: 0px;
+    }
+
+    .body-subitem h3 {
+        margin: 5px 0 10px 0;
+    }
+</style>
+
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>Dashboard</h1>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item" ng-repeat="supplier in suppliers">
+            <h2>{{supplier.name}}</h2>
+            <div class="body-subitem" ng-repeat="product in supplier.products">
+                <h3>{{product.name}}</h3>
+                <p>Available: {{formatInt(product.available)}}</p>
+                <p>Price: {{formatInt(product.price)}}</p>
+            </div>
+        </div>
+    </div>
+</div>

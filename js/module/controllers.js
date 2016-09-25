@@ -1,6 +1,6 @@
 angular.module('main.controllers', [])
 
-.controller('GlobalCtrl', function($scope, $rootScope, $interval, Inventory, Sales, General) {
+.controller('GlobalCtrl', function($scope, $rootScope, $interval, Entities, Inventory, Sales, General) {
     // Disable this on live production
     General.clearAll();
 
@@ -27,6 +27,11 @@ angular.module('main.controllers', [])
         stop = $interval(function() {
             var oldDate = $rootScope.date;
             var newDate = new Date($rootScope.date.getTime() + $rootScope.interval);
+
+            // Scheduled Processes
+            Inventory.scheduledProcess();
+            Sales.scheduledProcess();
+            Entities.scheduledProcess();
 
             $rootScope.date.setTime($rootScope.date.getTime() + $rootScope.interval + (newDate.getUTCHours() - oldDate.getUTCHours())*60000);
 
@@ -109,18 +114,23 @@ angular.module('main.controllers', [])
     $rootScope.title = "Home";
 })
 
-.controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
+.controller('SourcingCtrl', function($scope, $rootScope, Entities, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Procurement";
     $scope.purchase = {
         "units": 0
     };
+    Entities.generateSuppliers();
     
     // Watch the dashboard variables for change
     $scope.$watch(Inventory.getInventory, function() {
         $scope.invUnits = Inventory.getInventoryUnits();
         $scope.invValue = Inventory.getInventory();
         $scope.contracts = Inventory.getContracts();
+    });
+
+    $scope.$watch(Entities.getSuppliers, function() {
+        $scope.suppliers = Entities.getSuppliers();
     });
 
     /**
