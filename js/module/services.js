@@ -95,70 +95,64 @@ angular.module('main.services', [])
      */
     function getBooks() {
         if(localStorageService.get('generalledger') == null) {
-            var a = [];
+            var a = {};
             localStorageService.set('generalledger', JSON.stringify(a));
         }
         return JSON.parse(localStorageService.get('generalledger'));
     }
+    
+    /**
+     * Adds the given value to the accounting ledger. Also subtracts if the 
+     * value is negative.
+     * 
+     * @param - {account} The GL code for the account to add value to
+     * @param - {value} The amount to add into the account
+     * @author - Albert Deng
+     */
+    function addValue(account, value) {
+        var books = getBooks();
+        
+        // Force the account to a string, just in case the programmer forgot
+        account = account.toString(); 
+
+        if(books[account] == undefined) {
+            books[account] = value;
+        } else {
+            books[account] += value;
+        }
+
+        localStorageService.set('generalledger', JSON.stringify(books));
+    }
 
     return {
-        /**
-         * Adds the given value to the accounting ledger. Also subtracts if the 
-         * value is negative.
-         * 
-         * @param - {account} The GL code for the account to add value to
-         * @param - {value} The amount to add into the account
-         * @author - Albert Deng
-         */
-        addValue: function(account, value) {
-            var books = getBooks();
-            
-            // Force the account to an int, just in case the programmer forgot
-            account = parseInt(account); 
-
-            if(books[account] == undefined) {
-                books[account] = value;
-            } else {
-                books[account] += value;
-            }
-        },
         /** 
-         * Creates a journal entry from the provided debits and credits. Function 
-         * has support for multiple debits and multiple credits; to insert multiple
-         * debits or credits, pass them as arrays of transaction objects.
+         * Creates a journal entry from the provided transactions. 
          * 
          * A transaction object has the given form: [account, value]
+         * If value is positive, it is processed as a debit; if it is negative, it is a credit
          * 
          * @author - Albert Deng
-         * @param - {debits} Either an array of transactions or a single transaction
-         * @param - {credits} Either an array of transactions or a single transaction
+         * @param - {transactions} An array of transaction objects
          */
-        makeJournalEntry: function(debits, credits) {
-            // Check if the debits and credits arrays are multidimensional
-            var multiDebits = debits[0][0] != undefined;
-            var multiCredits = credits[0][0] != undefined;
+        makeJournalEntry: function(transactions) {
+            for(var i = 0; i < transactions.length; i++) {
+                var account = transactions[i][0];
+                var value = transactions[i][1];
 
-            for(var i = 1; i < debits.length && multiDebits; i++) {
-                addValue(debits[i][0], debits[i][1]);
+                // Check if account is debit
+                if(account.toString[0] == "1", "6", "8") {
+                    // Add positive value if debit, add negative if credit
+                    (value > 0) ? addValue(account, value) : addValue(account, -1 * value);
+                } else {
+                    // Add positive value if credit, add negative if debit
+                    (value > 0) ? addValue(account, -1 * value) : addValue(account, value);
+                }
             }
-
-            for(var j = 1; j < credits.length && multiCredits; j++) {
-                addValue(credits[i][0], credits[i][1]);
-            }
-
-            // Account for debit at index 0, or only debit if not multidimensional
-            var extraDebit = multiDebits ? debits[0] : debits;
-            addValue(extraDebit[i][0], extraDebit[i][1]);
-
-            
-            // Account for credit at index 0, or only credit if not multidimensional
-            var extraCredit = multiCredits ? credits[0] : credits;
-            addValue(extraCredit[i][0], extraCredit[i][1]);
         }
     }
 })
 
-.factory('Inventory', function(localStorageService) {
+.factory('Inventory', function(localStorageService, Accounting) {
     /**
      * Fetches and returns the inventory object from storage.
      * 
@@ -199,15 +193,29 @@ angular.module('main.services', [])
          * @author - Albert Deng
          * @param - {units} The number of units of inventory to purchase
          * @param - {price} The price of the inventory at the time of purchase
+         * @param - {account} Whether the inventory is purchased on account or not
          * @return - {Number} The value of inventory 
          */
-        buyInventory: function(units, price) {
+        buyInventory: function(units, price, account) {
+            account = account == undefined ? true : account;
+
             var invObj = getInventoryObj();
             var obj = {
                 'units': units,
                 'cost': price
             };
+            var value = units * price;
             invObj.push(obj);
+
+            // Make journal entry
+            // If on account, credit AP, otherwise cash
+            var credit = account ? 2001 : 1001;
+            Accounting.makeJournalEntry([
+                // Debit inventory
+                [1031, value],
+                // Credit cash
+                [credit, -1 * value]
+            ]);
 
             // Push updated inventory object to storage
             localStorageService.set('inventory', JSON.stringify(invObj));

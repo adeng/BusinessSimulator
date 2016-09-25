@@ -14,6 +14,6 @@
     "3002": "Retained Earnings",
     "5001": "Sales Revenue",
     "6001": "Cost of Goods Sold",
-    "9001": "Gain",
-    "9002": "Loss"
+    "8001": "Gain on Sale",
+    "9001": "Loss on Sale"
 }
