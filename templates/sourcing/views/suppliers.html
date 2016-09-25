@@ -2,6 +2,9 @@
     .body-subitem {
         background-color: #E9E9E9;
         padding: 10px;
+        flex-grow: 1;
+        flex-basis: 100px;
+        margin: 5px;
     }
 
     .body-subitem p {
@@ -27,8 +30,8 @@
             <h2>{{supplier.name}}</h2>
             <div class="body-subitem" ng-repeat="product in supplier.products">
                 <h3>{{product.name}}</h3>
-                <p>Available: {{formatInt(product.available)}}</p>
-                <p>Price: {{formatInt(product.price)}}</p>
+                <p>Available: {{formatInt(supplier.inventory[product.id].available)}}</p>
+                <p>Price: {{formatInt(supplier.inventory[product.id].price)}}</p>
             </div>
         </div>
     </div>

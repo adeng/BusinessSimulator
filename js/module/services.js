@@ -62,120 +62,141 @@ angular.module('main.services', [])
     }
 })
 
-.factory('Accounting', function($q, $http, localStorageService) {
+.factory('Entities', function($rootScope, localStorageService, Accounting, General) {
+    var suppliers = [
+        {
+            'name': "ACME Supply",
+            'products': [
+                {
+                    'name': 'Product 1',
+                    'id': '1'
+                },
+                {
+                    'name': 'Product 2',
+                    'id': '2'
+                }
+            ],
+            'inventory': {
+                "1": {
+                    'available': 500,
+                    'price': '4',
+                    'dailyProduction': 200
+                },
+                "2": {
+                    'available': 300,
+                    'price': '5',
+                    'dailyProduction': 2
+                }
+            }
+        }
+    ];
+
     /**
-     * Checks the local storage for the chart of accounts. If chart of 
-     * accounts data does not exist, refresh the localStorage with the data
-     * from the JSON file. 
-     * 
-     * @warning - If the chart of accounts data is not in local storage, may return null
+     * Fetches and returns the array of suppliers. Also updates the suppliers
+     * object.
      * 
      * @author - Albert Deng
-     * @return - {Object} The chart of accounts data
      */
-    function getChartOfAccounts() {
-        if(localStorageService.get('accounts') == null) {
-            refreshChartOfAccounts();
-        }
-        return JSON.parse(localStorageService.get('accounts'));
+    function getSuppliers() {
+        updateSuppliers();
+        return suppliers;
     }
 
     /**
-     * Download the chart of accounts data from the json file into local storage.
-     * Return a promise containing the chart of accounts data.
+     * Updates the localStorage suppliers object with the copy from the 
+     * local session.
      * 
      * @author - Albert Deng
-     * @return - {Promise} A promise that resolves to the chart of accounts data
      */
-    function refreshChartOfAccounts() {
-        var deferred = $q.defer();
-        $http.get('/data/accounts.json').success( function(data) {
-            deferred.resolve(data);
-            localStorageService.set('accounts', JSON.stringify(data));
-        })
-        return deferred.promise;
+    function updateSuppliers() {
+        localStorageService.set('suppliers', JSON.stringify(suppliers));
     }
 
     /**
-     * Fetches and returns the general ledger object from storage. If the object
-     * does not exist, then the function will create it.
+     * Creates a new supplier object and pushes it to the local variable. Then
+     * updates the copy in local storage.
      * 
      * @author - Albert Deng
-     * @return - {Object} The general ledger object 
      */
-    function getBooks() {
-        if(localStorageService.get('generalledger') == null) {
-            var a = {};
-            localStorageService.set('generalledger', JSON.stringify(a));
+    function createSupplierObject(name, products, inventory) {
+        var obj = {
+            'name': name,
+            'products': products,
+            'inventory': inventory
         }
-        return JSON.parse(localStorageService.get('generalledger'));
-    }
-    
-    /**
-     * Adds the given value to the accounting ledger. Also subtracts if the 
-     * value is negative.
-     * 
-     * @param - {account} The GL code for the account to add value to
-     * @param - {value} The amount to add into the account
-     * @author - Albert Deng
-     */
-    function addValue(account, value) {
-        var books = getBooks();
-        
-        // Force the account to a string, just in case the programmer forgot
-        account = account.toString(); 
-
-        if(books[account] == undefined) {
-            books[account] = value;
-        } else {
-            books[account] += value;
-        }
-
-        localStorageService.set('generalledger', JSON.stringify(books));
+        suppliers.push(obj);
+        updateSuppliers();
     }
 
     return {
-        /** 
-         * Creates a journal entry from the provided transactions. 
-         * 
-         * A transaction object has the given form: [account, value]
-         * If value is positive, it is processed as a debit; if it is negative, it is a credit
+        /**
+         * Contains the entities functions that are timer based. Is called in the
+         * timer update code.
          * 
          * @author - Albert Deng
-         * @param - {transactions} An array of transaction objects
          */
-        makeJournalEntry: function(transactions) {
-            for(var i = 0; i < transactions.length; i++) {
-                var account = transactions[i][0];
-                var value = transactions[i][1];
-
-                // Check if account is debit
-                if(account.toString()[0] == "1" || account.toString()[0] == "6" || account.toString()[0] == "8") {
-                    addValue(account, value);
-                } else {
-                    // Add positive value if credit, add negative if debit
-                    (value < 0) ? addValue(account, -1 * value) : addValue(account, value);
+        scheduledProcess: function() {
+            // If we are at the beginning of the day and time is running
+            if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
+                // Increase supplier inventory
+                for(var i = 0; i < suppliers.length; i++) {
+                    for(var j = 0; j < suppliers[i]['products'].length; j++) {
+                        var prodID = suppliers[i]['products'][j]['id'];
+                        suppliers[i]['inventory'][prodID]['available'] += suppliers[i]['inventory'][prodID]['dailyProduction'];
+                        console.log(suppliers[i]);
+                    }
                 }
+                updateSuppliers();
             }
         },
         /**
-         * Fetches and returns the company's general ledger.
+         * Returns the suppliers object.
          * 
          * @author - Albert Deng
-         * @return - {Object} The company's general ledger object
          */
-        getAccounts: function() {
-            return JSON.stringify(getBooks());
+        getSuppliers: function() {
+            return getSuppliers();
         },
         /**
-         * Update the chart of accounts data.
+         * Creates a new supplier object using local code.
          * 
          * @author - Albert Deng
          */
-        updateAccounts: function() {
-            return refreshChartOfAccounts();
+        createSupplier: function(name, products, inventory) {
+            createSupplierObject(name, products, inventory);
+        },
+        /**
+         * Generates the initial set of suppliers that define the procurement market
+         * for this business unit.
+         * 
+         * @author - Albert Deng
+         */
+        generateSuppliers: function() {
+            // Sample product that will be replaced with actual code later
+            var sampleProduct = {
+                'name': 'Product 1',
+                'id': '1'
+            };
+
+            var inventory = {
+                '1': {
+                    'available': 1000,
+                    'price': '7',
+                    'dailyProduction': 50
+                }
+            };
+
+            var numSuppliers = General.getRandomInt(2,5);
+            for(var i = 0; i < numSuppliers; i++) {
+                createSupplierObject('Supplier ' + General.getRandomInt(100,300), [sampleProduct], inventory);
+            }
+            updateSuppliers();
         }
     }
+})
+
+.factory('Products', function() {
+
 })
 
 .factory('Sales', function($interval, $rootScope, localStorageService, Inventory, Accounting) {
@@ -288,16 +309,20 @@ angular.module('main.services', [])
         return [cashSalesValue, creditSalesValue];
     }
 
-    // Scheduled function
-    $interval(function() {
-        // If we are at the beginning of a day and time is running
-        if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
-            var salesInfo = makeSale();
-            updateSalesAmount(salesInfo[0], salesInfo[1], $rootScope.date.getDate() == 1, $rootScope.date.getDate());
-        }
-    }, 1000);
-
     return {
+        /**
+         * Contains the sales functions that are timer based. Is called in the
+         * timer update code.
+         * 
+         * @author - Albert Deng
+         */
+        scheduledProcess: function() {
+            // If we are at the beginning of a day and time is running
+            if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
+                var salesInfo = makeSale();
+                updateSalesAmount(salesInfo[0], salesInfo[1], $rootScope.date.getDate() == 1, $rootScope.date.getDate());
+            }
+        },
         /**
          * Return total, monthly, and average daily sales information in a string
          * representation.
@@ -325,18 +350,6 @@ angular.module('main.services', [])
 .factory('Inventory', function($interval, $rootScope, localStorageService, General, Accounting) {
     var contracts = [];
     
-    // Scheduled function to execute contracts and stuff
-    $interval(function() {
-        if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
-            for(var i = 0; i < contracts.length; i++) {
-                // Buy inventory on account if date terms are met
-                if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0) {
-                    buyInventory(contracts[i][0], contracts[i][1], true);
-                }
-            }
-        }
-    }, 1000);
-
     /**
      * Fetches and returns the inventory object from storage.
      * 
@@ -406,6 +419,22 @@ angular.module('main.services', [])
     }
 
     return {
+        /**
+         * Contains the inventory functions that are timer based. Is called in the
+         * timer update code.
+         * 
+         * @author - Albert Deng
+         */
+        scheduledProcess: function() {
+            if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
+                for(var i = 0; i < contracts.length; i++) {
+                    // Buy inventory on account if date terms are met
+                    if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0) {
+                        buyInventory(contracts[i][0], contracts[i][1], true);
+                    }
+                }
+            }
+        },
         /**
          * Insert new inventory object entry into the inventory object. Will then 
          * calculate and return the inventory value based on the currently selected
@@ -509,6 +538,122 @@ angular.module('main.services', [])
          */
         makeContract: function(quantity, price, days) {
             contracts.push([quantity, price, days, new Date($rootScope.date.getTime())]);
+        }
+    }
+})
+
+.factory('Accounting', function($q, $http, localStorageService) {
+    /**
+     * Checks the local storage for the chart of accounts. If chart of 
+     * accounts data does not exist, refresh the localStorage with the data
+     * from the JSON file. 
+     * 
+     * @warning - If the chart of accounts data is not in local storage, may return null
+     * 
+     * @author - Albert Deng
+     * @return - {Object} The chart of accounts data
+     */
+    function getChartOfAccounts() {
+        if(localStorageService.get('accounts') == null) {
+            refreshChartOfAccounts();
+        }
+        return JSON.parse(localStorageService.get('accounts'));
+    }
+
+    /**
+     * Download the chart of accounts data from the json file into local storage.
+     * Return a promise containing the chart of accounts data.
+     * 
+     * @author - Albert Deng
+     * @return - {Promise} A promise that resolves to the chart of accounts data
+     */
+    function refreshChartOfAccounts() {
+        var deferred = $q.defer();
+        $http.get('/data/accounts.json').success( function(data) {
+            deferred.resolve(data);
+            localStorageService.set('accounts', JSON.stringify(data));
+        })
+        return deferred.promise;
+    }
+
+    /**
+     * Fetches and returns the general ledger object from storage. If the object
+     * does not exist, then the function will create it.
+     * 
+     * @author - Albert Deng
+     * @return - {Object} The general ledger object 
+     */
+    function getBooks() {
+        if(localStorageService.get('generalledger') == null) {
+            var a = {};
+            localStorageService.set('generalledger', JSON.stringify(a));
+        }
+        return JSON.parse(localStorageService.get('generalledger'));
+    }
+    
+    /**
+     * Adds the given value to the accounting ledger. Also subtracts if the 
+     * value is negative.
+     * 
+     * @param - {account} The GL code for the account to add value to
+     * @param - {value} The amount to add into the account
+     * @author - Albert Deng
+     */
+    function addValue(account, value) {
+        var books = getBooks();
+        
+        // Force the account to a string, just in case the programmer forgot
+        account = account.toString(); 
+
+        if(books[account] == undefined) {
+            books[account] = value;
+        } else {
+            books[account] += value;
+        }
+
+        localStorageService.set('generalledger', JSON.stringify(books));
+    }
+
+    return {
+        /** 
+         * Creates a journal entry from the provided transactions. 
+         * 
+         * A transaction object has the given form: [account, value]
+         * If value is positive, it is processed as a debit; if it is negative, it is a credit
+         * 
+         * @author - Albert Deng
+         * @param - {transactions} An array of transaction objects
+         */
+        makeJournalEntry: function(transactions) {
+            for(var i = 0; i < transactions.length; i++) {
+                var account = transactions[i][0];
+                var value = transactions[i][1];
+
+                // Check if account is debit
+                if(account.toString()[0] == "1" || account.toString()[0] == "6" || account.toString()[0] == "8") {
+                    addValue(account, value);
+                } else {
+                    // Add positive value if credit, add negative if debit
+                    (value < 0) ? addValue(account, -1 * value) : addValue(account, value);
+                }
+            }
+        },
+        /**
+         * Fetches and returns the company's general ledger.
+         * 
+         * @author - Albert Deng
+         * @return - {Object} The company's general ledger object
+         */
+        getAccounts: function() {
+            return JSON.stringify(getBooks());
+        },
+        /**
+         * Update the chart of accounts data.
+         * 
+         * @author - Albert Deng
+         */
+        updateAccounts: function() {
+            return refreshChartOfAccounts();
         }
     }
 });
