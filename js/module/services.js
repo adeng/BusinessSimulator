@@ -291,7 +291,7 @@ angular.module('main.services', [])
     // Scheduled function
     $interval(function() {
         // If we are at the beginning of a day and time is running
-        if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
+        if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
             var salesInfo = makeSale();
             updateSalesAmount(salesInfo[0], salesInfo[1], $rootScope.date.getDate() == 1, $rootScope.date.getDate());
         }
@@ -327,7 +327,7 @@ angular.module('main.services', [])
     
     // Scheduled function to execute contracts and stuff
     $interval(function() {
-        if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
+        if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
             for(var i = 0; i < contracts.length; i++) {
                 // Buy inventory on account if date terms are met
                 if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0) {

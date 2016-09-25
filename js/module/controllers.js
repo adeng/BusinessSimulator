@@ -6,9 +6,10 @@ angular.module('main.controllers', [])
 
     /* Time Code */
     $rootScope.date = new Date("1/1/2000");
+    $rootScope.date.setTime($rootScope.date.getTime() - $rootScope.date.getTimezoneOffset()*60000);
     $rootScope.interval = (24 * 60 * 60 * 1000);
     $rootScope.runTime = false;
-    $rootScope.formattedDate = $rootScope.date.toLocaleString();
+    $rootScope.formattedDate = $rootScope.date.toUTCString();
 
     var stop;
     
@@ -24,8 +25,12 @@ angular.module('main.controllers', [])
         $rootScope.runTime = true;
         
         stop = $interval(function() {
-            $rootScope.date.setTime($rootScope.date.getTime() + $rootScope.interval);
-            $rootScope.formattedDate = $rootScope.date.toLocaleString();
+            var oldDate = $rootScope.date;
+            var newDate = new Date($rootScope.date.getTime() + $rootScope.interval);
+
+            $rootScope.date.setTime($rootScope.date.getTime() + $rootScope.interval + (newDate.getUTCHours() - oldDate.getUTCHours())*60000);
+
+            $rootScope.formattedDate = $rootScope.date.toUTCString();
         }, 1000);
     }
 
