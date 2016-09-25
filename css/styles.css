@@ -38,6 +38,10 @@ p {
 /* UI Elements
 -------------------------------------------------- */
 
+.body-content {
+    background-color: #E6E6E6;
+}
+
 .table {
     width: 100%;
     max-width: 100%;
@@ -166,6 +170,7 @@ hr {
 
 .inner-box {
     margin: 0px; /* used to be 5px */
+    background: url("/data/img/background.jpg");
     background-color: #3498db;
     background-size: cover !important;
     background-position: center !important;
@@ -275,7 +280,7 @@ hr {
 -------------------------------------------------- */
 
 .navbar-selected {
-    box-shadow: inset 5px 0 0 0 #356A95;
+    box-shadow: inset 5px 0 0 0 #4CAF50;
 }
 
 .win-splitviewcommand-label, .header-pivot {

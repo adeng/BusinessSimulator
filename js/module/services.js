@@ -1,4 +1,9 @@
 angular.module('main.services', [])
 
-.factory('Time', function($interval) {
+.factory('Inventory', function($q, $http) {
+    return {
+        buyInventory: function(units, price) {
+            var deferred = $q.defer();
+        }
+    }
 });

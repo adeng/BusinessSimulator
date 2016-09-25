@@ -10,5 +10,10 @@
 			controller: 'HomeCtrl'
 		})
 
+        .state('sourcing', {
+			url: '/sourcing',
+			templateUrl: 'templates/sourcing/index.html',
+			controller: 'SourcingCtrl'
+		})
     });
 })();

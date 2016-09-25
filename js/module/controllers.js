@@ -50,6 +50,12 @@ angular.module('main.controllers', [])
     }
 })
 
-.controller('HomeCtrl', function($scope) {
+.controller('HomeCtrl', function($rootScope) {
+    $rootScope.title = "Home";
+})
+
+.controller('SourcingCtrl', function($scope, $rootScope) {
+    $rootScope.title = "Sourcing";
+    $scope.units = 0;
 
 });
