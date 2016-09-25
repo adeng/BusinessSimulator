@@ -27,6 +27,8 @@
 			templateUrl: 'templates/financials/index.html',
 			controller: 'FinancialsCtrl'
 		})
+		
+		$urlRouterProvider.otherwise("/");
     })
 
     /* Configure storage module */

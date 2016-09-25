@@ -45,6 +45,18 @@ angular.module('main.controllers', [])
         stop = undefined;
     }
 
+    /**
+     * Toggles the timer depending on the current run state.
+     * 
+     * @author - Albert Deng
+     */
+    $rootScope.toggleTime = function() {
+        if($rootScope.runTime == true)
+            $rootScope.stopTime();
+        else
+            $rootScope.startTime();
+    }
+
     // Start time by default
     $rootScope.startTime();
 
@@ -99,7 +111,7 @@ angular.module('main.controllers', [])
 
 .controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
     // Initialization Code
-    $rootScope.title = "Sourcing";
+    $rootScope.title = "Procurement";
     $scope.purchase = {
         "units": 0
     };

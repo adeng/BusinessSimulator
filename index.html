@@ -40,7 +40,17 @@
     <div id="header-container" class="hidden">
         <win-split-view-pane-toggle split-view="splitViewElement"></win-split-view-pane-toggle>
         <div class="header-bar">
-            <h4>{{title}}</h4>
+            <win-tool-bar>
+                <!--<h4>{{title}}</h4>-->
+                <win-tool-bar-content id="header">
+                    <h4>{{title}}</h4>
+                </win-tool-bar-content>
+                <win-tool-bar-content>
+                    <p><b>Time:</b> {{formattedDate}}</p>
+                </win-tool-bar-content>
+                <win-tool-bar-command label="'Pause'" icon="'none'" type="'toggle'" ng-click="toggleTime()">
+                </win-tool-bar-command>
+            </win-tool-bar>
         </div>
     </div> 
 
@@ -49,7 +59,7 @@
             <win-split-view-command label="'Home'" icon="'empty'" ui-sref="home" ng-class="{'navbar-selected': title == 'Home'}" ng-click="hidePane()">
                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACH0lEQVR4Xu2Z61UEIQyFJ51sKdqJW5naiZ1oJ/GAM55ZdoAQkjCP+Fcg935JgGFhuvgfXNz/5AC8Ai5OYGgLIOJb4A8AH6PyMAzAbP59Nn4fBWEIgMT8kvwhEMwBZMwPg2AKoGJ+CAQzAETz5hBMABTM32fHy2a4PgxM9gR1ACXzy85PGaN1TKoCaDHWMlYShhoAjiHOnF4YKgB6jPTM5cAQByBhQGINKgxRAJLCJdcqwRADoCFYY80UhggATaGaa8cvUWqv5MZpCwxxNWN0AdAUlgLXisUGoCWoVJEaMVkANIRQW1E6djMAaQFU4+txkhqaAEgG5hjXgEAGsCfzCwgJTSQAEoF6M651DFcB7Nm8RCUUARTMh7f8KjytrG+ti4iYiVd8WcqaKJmPV8jjAAhysxA2AdTMHxBAFsITAES8TdP0XStfagUUSrMWIv5fOM4rAHytA1MrILzePrzcCgvLwuiIk2r+BID4W2QVQPIFFvsnzWSHMFLml0HcOGHeqpU3zccKq3x83ADgZwbysMtyhTW572iBRR8ivqRlT6qAVKhUBdTAWcX5rzBqRqyEWcVxADMB8m3OKjNWcbwCvAL+CHgL+ClAJGC1OVnF8U3QN0HfBP0U8GPQ7wF+EeLfBInXh6dhre8BWnG67wFawnofUVuf0tjfAg6ASeCwLcD0u/tp5BbYvROmQAfABHeaaV4Bp0kl04hXABPcaab9AkFDTl9/GYhbAAAAAElFTkSuQmCC" class="icon" />
             </win-split-view-command>
-            <win-split-view-command label="'Sourcing'" icon="'empty'" ui-sref="sourcing" ng-class="{'navbar-selected': title == 'Sourcing'}">
+            <win-split-view-command label="'Procurement'" icon="'empty'" ui-sref="sourcing" ng-class="{'navbar-selected': title == 'Procurement'}">
                 <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAHFSURBVHhe7ZiBVcIwEIapEzBCR8ANHIERdAM2cASfEzCCI+gGuIFuoBOA/9nfAkJNejVNNf/3Xt41CeG/XJNLYCaEEEIIIYSP3W53jZKLJd1wU9G6gAM1yqaqqjmbcnAJ/Wc+9+aCtjeY+BxlnXny5scDH10MCcAtJn/FajbgQ73dbgcFoTeY/Mm+hxNrdifHJkzZQwbngyggZBF/azQbUH+BGW0rmBY0N5/ixyz4kTRAwIQfG60GBmP0rQBNS8BH2ItgdxogcEetFrSt2D06kF82XuyBP2nyAb4753nfl+h8EH0PsKWe+8jrA3yNmlt0ACysfPwTxAbAfQ/4L7hXQGyEx8LrX/ErQAGgLZbkAcDWXOAIPXdt/RGMsRtn9h9bLY1be9gchBNxgbHRV1sOaWFzkDG2QE3r4Z02GckDgNPoBi/kldVoMOYJY+9ZTYbuAbTFogDQFosCQFsskwwALkArK6yeEOpPgh0zh7D517GJUeLs/41d/WxqYXOQyd0DQjpd/aFxXSgH0BZL8QGYXA7wohzgZHIr4LtOiC8/vP4pCdIWi3IAbRDvHhsL5QAn7hUwdbQCIlEAaIUQQgghhCiK2ewDK89Aeai0VOIAAAAASUVORK5CYII=" class="icon" />
             </win-split-view-command>
             <win-split-view-command label="'Sales'" icon="'empty'" ui-sref="sales" ng-class="{'navbar-selected': title == 'Sales'}">
