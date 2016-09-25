@@ -92,9 +92,12 @@ angular.module('main.controllers', [])
 .controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Sourcing";
-    $scope.invUnits = Inventory.getInventoryUnits();
-    $scope.invValue = Inventory.getInventory();
-    $scope.contracts = Inventory.getContracts();
+    
+    $scope.$watch(Inventory.getInventory, function() {
+        $scope.invUnits = Inventory.getInventoryUnits();
+        $scope.invValue = Inventory.getInventory();
+        $scope.contracts = Inventory.getContracts();
+    });
 
     $scope.buyUnits = function(units, price) {
         Inventory.buyInventory(units, price);
@@ -123,7 +126,8 @@ angular.module('main.controllers', [])
         $scope.GL = val;
     });
 
-    $scope.books = Accounting.getAccounts();
-    console.log($scope.books);
-    $scope.accounts = Object.keys($scope.books);
+    $scope.$watch(Accounting.getAccounts, function() {
+        $scope.books = JSON.parse(Accounting.getAccounts());
+        $scope.accounts = Object.keys($scope.books);
+    });
 });

@@ -165,7 +165,7 @@ angular.module('main.services', [])
          * @return - {Object} The company's general ledger object
          */
         getAccounts: function() {
-            return getBooks();
+            return JSON.stringify(getBooks());
         },
         /**
          * Update the chart of accounts data.
