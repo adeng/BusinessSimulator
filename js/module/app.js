@@ -1,5 +1,5 @@
 (function() {
-	var home = angular.module('main', ['winjs', 'ui.router', 'main.controllers', 'main.services'])
+	var home = angular.module('main', ['winjs', 'LocalStorageModule', 'ui.router', 'main.controllers', 'main.services'])
 	
 	.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
 		$stateProvider
@@ -15,5 +15,14 @@
 			templateUrl: 'templates/sourcing/index.html',
 			controller: 'SourcingCtrl'
 		})
+    })
+
+    /* Configure storage module */
+    .config(function(localStorageServiceProvider) {
+        localStorageServiceProvider
+            .setPrefix('businessSimulator')
+            .setStorageType('localStorage')
+            .setStorageCookie((10*365), '/', false)
+            .setNotify(true, true);
     });
 })();
