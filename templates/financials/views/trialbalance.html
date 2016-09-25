@@ -9,7 +9,7 @@
 <div>
     <ul>
         <li ng-repeat="account in accounts">
-            {{GL[account]}}: {{books[account]}}
+            {{GL[account]}}: {{formatInt(books[account])}}
         </li>
     </ul>
 </div>
