@@ -1,0 +1,654 @@
+/* GLOBAL STYLES
+-------------------------------------------------- */
+/* Padding below the footer and lighter body text */
+
+* { 
+    font-family: 'Open Sans', sans-serif !important;
+    box-sizing: border-box;
+    font-weight: 500;
+}
+
+h1 { 
+    font-weight: 100;
+}
+
+body {
+  padding-bottom: 38px;
+  color: #5a5a5a;
+  /*background-color: #E6E6E6 !important;*/
+  overflow: hidden !important;
+}
+    
+p {
+    color: rgb(89, 89, 89);
+}
+
+.win-splitview-content {
+    overflow: scroll !important;
+}
+
+::-webkit-scrollbar { 
+    display: none; 
+}
+
+.win-pivot-item-content {
+    padding: 0px !important;
+}
+
+/* UI Elements
+-------------------------------------------------- */
+
+.table {
+    width: 100%;
+    max-width: 100%;
+    /*margin-bottom: 20px;*/
+    background-color: transparent;
+    border-spacing: 0;
+    border-collapse: collapse;
+    box-sizing: border-box;
+}
+
+th, td {
+    padding: 8px;
+}
+
+tbody td {
+    border-bottom: 1px solid #D2D2D2;
+}
+
+tbody tr {
+    border: 0px solid grey;
+}
+
+tbody tr:hover td {
+    box-shadow: inset 0 2px 0 0 grey, inset 0 -2px 0 0 grey;
+    border-bottom: 1px solid rgba(0,0,0,0);
+}
+
+tbody tr:hover td:first-child {
+    box-shadow: inset 2px 0 0 0 grey, inset 0 2px 0 0 grey, inset 0 -2px 0 0 grey;
+}
+
+tbody tr:hover td:last-child {
+    box-shadow: inset -2px 0 0 0 grey, inset 0 2px 0 0 grey, inset 0 -2px 0 0 grey;
+}
+
+tbody tr:active {
+    transform: scaleX(0.98);
+}
+
+/*tbody tr:active {
+    border-left: 10px solid lightgrey;
+    border-right: 10px solid lightgrey;
+    background-color: grey !important;
+}
+
+tbody tr:active td:first-child {
+    padding-left: 5px;
+}*/
+
+.display p {
+    margin-left: 15px;
+}
+
+hr {
+    margin: 20px 0 20px 0 !important;
+}
+
+.page-padding {
+    padding: 12px 24px 12px 24px;
+}
+
+.win-pivot-item {
+    position: static !important;
+}
+
+.header-bar {
+    display:inline;
+    position:fixed;
+    width:100%;
+    background-color: #F2F2F2;
+    height: 38px;
+}
+
+.header-bar h4 {
+    margin-top: 0px;
+    padding: 10px;
+    font-weight: 600;
+}
+
+.win-pivot-navbutton-prev:before {
+    content: "◀" !important;
+}
+
+.win-pivot .win-pivot-headers .win-pivot-navbutton-next:before {
+    content: "▶" !important;
+}
+
+.win-pivot-header-items {
+    padding: 0px !important;
+}
+
+.header-pivot .win-pivot-header-area {
+    background-color: #F2F2F2;
+    position:fixed;
+    top: 37px;
+    width: 100%;
+    z-index: 1000;
+}
+
+.header-pivot .win-pivot-headers {
+    margin-left: 0;
+}
+
+.header-pivot .win-pivot-header {
+    font-size: 14px !important;
+}
+
+.header-pivot .win-pivot-header-selected {
+    font-weight: bold !important;
+}
+
+.outer-box {
+    width: 100%;
+    padding: 0; /* used to be 5% */
+    padding-bottom: 0%;
+    position: relative;
+}
+
+.gradient-box {
+    width: 100%;
+    height: 45%;
+    position: absolute;
+    bottom: 0;
+    background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.9));
+}
+
+.inner-box {
+    margin: 0px; /* used to be 5px */
+    background-color: #3498db;
+    background-size: cover !important;
+    background-position: center !important;
+    color: white;
+    padding: 5%;
+    transition: left 0.5s;
+    min-height: 40vh;
+    position: relative;
+}
+
+.inner-box h1 {
+    position: absolute;
+    bottom: 10%;
+    z-index: 10;
+}
+
+.inner-box p {
+    color: white;
+}
+
+.box-card {
+    top: 10% !important;
+    height: 80%;
+    right: 5vh;
+    min-width: 358px;
+    width: 50%;
+    position: absolute;
+    background-color: rgba(248,248,248,0.2);
+    color: white;
+    padding: 4vh;
+    z-index: 10;
+}
+
+.box-card:hover {
+    box-shadow: inset 0 0 0 2px rgb(250,250,250);
+}
+
+.box-card h4 {
+    font-size: 1.8vh;
+    margin: 5px;
+}
+
+.box-card ul {
+    margin: 5px;
+}
+
+.box-card li {
+    font-size: 1.5vh;
+    list-style-type: none;
+}
+
+.box-card-mobile {
+    margin-top: 40px !important;
+    background-color: #E2E2E2;
+    width: 85%;
+    margin: auto;
+    padding: 12px;
+}
+
+.box-card-mobile:hover {
+    background-color: white;
+    box-shadow: inset 0 0 0 2px #A2A2A2;
+    transition: box-shadow 0.2s;
+}
+
+.box-card-mobile {
+    display: none;
+}
+
+.box-card-mobile h4 {
+    font-size: 1.8vh;
+    margin: 5px;
+}
+
+.box-card-mobile ul {
+    margin: 5px;
+}
+
+.box-card-mobile li {
+    font-size: 1.5vh;
+    list-style-type: none;
+}
+
+@media (max-width: 700px), (max-height: 660px) {
+    .box-card {
+        display: none;
+    }
+
+    .box-card-mobile {
+        display: block;
+    }
+}
+
+@media (max-height: 700px) {
+    .box-card-mobile h4 {
+        font-size: 14px;
+        margin: 5px;
+    }
+
+    .box-card-mobile li {
+        font-size: 12px;
+        list-style-type: none;
+    }
+}
+
+/* NAVBAR
+-------------------------------------------------- */
+
+.navbar-selected {
+    box-shadow: inset 5px 0 0 0 #356A95;
+}
+
+.win-splitviewcommand-label, .header-pivot {
+    -webkit-user-select: none;  /* Chrome all / Safari all */
+    -moz-user-select: none;     /* Firefox all */
+    -ms-user-select: none;      /* IE 10+ */
+}
+
+/* Special class on .container surrounding .navbar, used for positioning it into place. */
+.navbar-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 20;
+}
+
+/* Flip around the padding for proper display in narrow viewports */
+.navbar-wrapper > .container {
+  padding-right: 0;
+  padding-left: 0;
+}
+.navbar-wrapper .navbar {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+.navbar-wrapper .navbar .container {
+  width: auto;
+}
+
+/* Circles
+-------------------------------------------------- */
+
+/* Center align the text within the three columns below the carousel */
+.marketing .col-lg-4 {
+  margin-bottom: 20px;
+  text-align: center;
+}
+.marketing h2 {
+  font-weight: normal;
+}
+.marketing .col-lg-4 p {
+  margin-right: 10px;
+  margin-left: 10px;
+}
+
+
+/* Featurettes
+------------------------- */
+
+.featurette-divider {
+  margin: 80px 0; /* Space out the Bootstrap <hr> more */
+}
+
+/* Thin out the marketing headings */
+.featurette-heading {
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+/* Tables
+-------------------------------------------------- */
+
+.clickable {
+  cursor: pointer;
+}
+
+.pos {
+  color: green;
+}
+
+.neg {
+  color: red;
+}
+
+thead {
+    background-color: #D2D2D2;
+    color: #4A4A4A;
+}
+
+th {
+    border: 2px solid #fff;
+    font-weight: 100;
+    font-size: 14px;
+    border-bottom: 0px !important;
+}
+
+.skills-table {
+    width: 100%;
+}
+
+.skills-table td:first-child {
+    width: 35%;
+    padding-left: 5%;
+}
+
+.skills-table td:nth-child(2) {
+    width: 30%;
+}
+
+.skills-table td > div {
+    width: 80%;
+    height: 6px;
+    margin: auto;
+    /*height: 5px;*/
+    border: 2px solid grey;
+}
+
+.progress-bar {
+    height: 100%;
+    background-color: grey;
+}
+
+/* Button Filters
+-------------------------------------------------- */
+
+.filter-btns {
+  /*padding-bottom: 40px;*/
+  width: 80%;
+  margin: auto;
+}
+
+/* Timeline
+-------------------------------------------------- */
+
+/*.timeline {
+  padding: 0px;
+  border-top: 2px solid #EEE;
+}
+
+.timeline::before {
+  position: absolute;
+  width: 2px;
+  background-color: #EEE;
+  left: 50%;
+  margin-left: -1.5px;
+  content: "";
+  height: 1500px;
+}*/
+
+.timeline > li {
+  list-style-type: none;
+  width: 100%;
+  display: table;
+  margin: 25px 0 25px 0;
+}
+
+.timeline > li > .thumbnail {
+  width: 90%;
+  border-radius: 0px;
+  border: 2px solid #D2D2D2;
+  padding: 20px;
+}
+
+.timeline > li > .thumbnail:hover {
+    border: 2px solid black;
+    transition: border 0.2s;
+}
+
+.timeline > li:nth-child(odd) > .thumbnail {
+  float: left;
+}
+
+.timeline > li:nth-child(even) > .thumbnail {
+  float: right;
+}
+
+@media (max-width: 850px) {
+    .timeline {
+        padding: 0px;
+    }
+    
+    .timeline > li > .thumbnail {
+        width: 100%;
+    }
+}
+
+.thumbnail > .badge {
+  margin: 10px 0px 0px 10px;
+  font-size: 80%;
+  display: inline;
+  padding: 5px;
+}
+
+.alert-success {
+    color: rgb(106,158,51);
+}
+
+.alert-warning {
+    color: rgb(232, 125, 55);
+}
+
+.thumbnail > .badge:first-child {
+    margin: 0px;
+}
+
+.thumbnail > .caption {
+  padding-top: 0px;
+} 
+
+.caption h3 {
+    margin-bottom: 0px;
+}
+
+.caption h4 {
+    margin-top: 5px;
+    font-weight: 300;
+    margin-bottom: 10px;
+}
+
+/* Selector
+-------------------------------------------------- */
+
+.selector {
+    text-align: center;
+    line-height: 250%;
+}
+
+.selector-hidden {
+    display: none;
+}
+
+.selector h3 {
+    display: inline;
+    color: #A2A2A2;
+    margin: 20px 20px 40px 20px;
+}
+
+.selector h3:hover {
+    color: rgba(53,106,149,0.4);
+}
+
+.selector .optional {
+    display: inline;
+}
+
+.selector-active {
+    color: rgb(53,106,149) !important;
+    font-weight: bold;
+    border-bottom: 2px solid rgb(53,106,149);
+}
+
+@media (max-width: 650px) {
+    .selector {
+        display: none;
+    }
+    
+    .selector-hidden {
+        display: block;
+    }
+}
+
+/* Animations for UI View
+-------------------------------------------------- */
+
+/* Have to set height explicity on ui-view 
+to prevent collapsing during animation*/
+.ui-view-container {
+  position: relative;
+  height: 65px;
+}
+
+[ui-view].ng-enter, [ui-view].ng-leave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  -webkit-transition:all .5s ease-in-out;
+    -moz-transition:all .5s ease-in-out;
+    -o-transition:all .5s ease-in-out;
+    transition:all .5s ease-in-out;
+}
+
+[ui-view].ng-enter {
+  opacity: 0;
+  -webkit-transform:scale3d(0.5, 0.5, 0.5);
+  -moz-transform:scale3d(0.5, 0.5, 0.5);
+  transform:scale3d(0.5, 0.5, 0.5);
+}
+
+[ui-view].ng-enter-active {
+  opacity: 1;
+  -webkit-transform:scale3d(1, 1, 1);
+  -moz-transform:scale3d(1, 1, 1);
+  transform:scale3d(1, 1, 1);
+}
+
+[ui-view].ng-leave {
+  opacity: 1; 
+  -webkit-transform:translate3d(0, 0, 0);
+  -moz-transform:translate3d(0, 0, 0);
+  transform:translate3d(0, 0, 0);
+}
+
+[ui-view].ng-leave-active {
+  opacity: 0;
+  -webkit-transform:translate3d(100px, 0, 0);
+  -moz-transform:translate3d(100px, 0, 0);
+  transform:translate3d(100px, 0, 0);
+}
+
+
+/* RESPONSIVE CSS
+-------------------------------------------------- */
+
+@media (min-width: 768px) {
+  /* Navbar positioning foo */
+  .navbar-wrapper {
+    margin-top: 20px;
+  }
+  .navbar-wrapper .container {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  .navbar-wrapper .navbar {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  /* The navbar becomes detached from the top, so we round the corners */
+  .navbar-wrapper .navbar {
+    border-radius: 4px;
+  }
+
+  /* Bump up size of carousel content */
+  .carousel-caption p {
+    margin-bottom: 20px;
+    font-size: 21px;
+    line-height: 1.4;
+  }
+
+  .featurette-heading {
+    font-size: 50px;
+  }
+}
+
+@media (min-width: 992px) {
+  .featurette-heading {
+    margin-top: 120px;
+  }
+}
+
+@media (min-width: 500px) {
+    .size-matters {
+        display:none;
+    }
+    
+    .optional {
+        display: table-cell;
+    }
+}
+
+@media (max-width: 500px) {
+    .jumbotron {
+        padding: 10px 5% 10px 5%;
+    }
+    
+    .optional {
+        display:none;
+    }
+    
+    .size-matters {
+        display: table-cell;
+    }
+    
+    p {
+        /*font-size: 18.5px !important;*/
+        padding: 5%;
+    }
+}
+
+@media (max-width: 280px) {
+    p {
+        font-size: 7vw !important;
+    }
+}

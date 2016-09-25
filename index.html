@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <base href="/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Welcome</title>
+
+    <!-- Bootstrap -->
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
+    <link href="css/ui-light.min.css" rel="stylesheet" />
+    <style>
+        .hidden {
+            display:none;
+        }
+        
+        #loader {
+            position:absolute;
+            text-align: center;
+            top: 50%;
+            width: 100vw;
+        }
+
+        .icon {
+            width: 24px;
+            position: absolute;
+            left: 12px;
+            top: 12px;
+        }
+    </style>
+  </head>
+  <body ng-app="main" ng-controller="GlobalCtrl">
+    <div id="loader">
+        <h1 style="text-align: center">Loading...</h1>
+    </div>
+    
+    <div id="header-container" class="hidden">
+        <win-split-view-pane-toggle split-view="splitViewElement"></win-split-view-pane-toggle>
+        <div class="header-bar">
+            <h4>{{title}}</h4>
+        </div>
+    </div> 
+
+    <win-split-view win-control="splitViewObject" id="splitView" closed-display-mode="'none'">
+        <win-split-view-pane>
+            <win-split-view-command label="'Home'" icon="'empty'" ui-sref="home" ng-class="{'navbar-selected': title == 'Home'}" ng-click="hidePane()">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACH0lEQVR4Xu2Z61UEIQyFJ51sKdqJW5naiZ1oJ/GAM55ZdoAQkjCP+Fcg935JgGFhuvgfXNz/5AC8Ai5OYGgLIOJb4A8AH6PyMAzAbP59Nn4fBWEIgMT8kvwhEMwBZMwPg2AKoGJ+CAQzAETz5hBMABTM32fHy2a4PgxM9gR1ACXzy85PGaN1TKoCaDHWMlYShhoAjiHOnF4YKgB6jPTM5cAQByBhQGINKgxRAJLCJdcqwRADoCFYY80UhggATaGaa8cvUWqv5MZpCwxxNWN0AdAUlgLXisUGoCWoVJEaMVkANIRQW1E6djMAaQFU4+txkhqaAEgG5hjXgEAGsCfzCwgJTSQAEoF6M651DFcB7Nm8RCUUARTMh7f8KjytrG+ti4iYiVd8WcqaKJmPV8jjAAhysxA2AdTMHxBAFsITAES8TdP0XStfagUUSrMWIv5fOM4rAHytA1MrILzePrzcCgvLwuiIk2r+BID4W2QVQPIFFvsnzWSHMFLml0HcOGHeqpU3zccKq3x83ADgZwbysMtyhTW572iBRR8ivqRlT6qAVKhUBdTAWcX5rzBqRqyEWcVxADMB8m3OKjNWcbwCvAL+CHgL+ClAJGC1OVnF8U3QN0HfBP0U8GPQ7wF+EeLfBInXh6dhre8BWnG67wFawnofUVuf0tjfAg6ASeCwLcD0u/tp5BbYvROmQAfABHeaaV4Bp0kl04hXABPcaab9AkFDTl9/GYhbAAAAAElFTkSuQmCC" class="icon" />
+            </win-split-view-command>
+            <!--<win-split-view-command label="'Projects'" icon="'empty'" ui-sref="fun" ng-class="{'navbar-selected': title == 'Projects'}">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABIElEQVR4Xu2ZSxICQQhDp+9/6LZcuHA2hC6oauC5NY4QEj66nuGvNTz/BwJQwHAGsMBwAdAEsQAWEBnYe28RegVsrSWpWwJ9M4IAFIAFXD1A9WBUw3hbVP3+tB6gBgABQQyggFeTVhWYZoGgwh4/BgJYhNgEJXtLoGMjFvggBBQoUmqIKECll3OYc5hz2HUOq9bKwrVbha2ErrsGoysLAcZxgwL4PeDfdJZlfmh5E2QRYhEavghFj7Vbnif3gFsCjo4DAqIZrfY8WQGMQcbg8DGIBZIsoO7sVnMtew1CgPgnJgowGChrAauyp++r1mIRUhlmDCaNQbUAXly4BbwBVMHLPaBKQt44IcDLWDc8CuhWUW8+KMDLWDc8CuhWUW8+H/7NwEGNBPR3AAAAAElFTkSuQmCC" class="icon" />
+            </win-split-view-command>-->
+        </win-split-view-pane>
+        <win-split-view-content>
+            <div ui-view>
+            </div>
+        </win-split-view-content>
+    </win-split-view>
+  </body>
+  
+    <!-- Angular -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.7/angular.min.js"></script>
+    <script src="js/core/angular-ui-router.min.js"></script>
+        
+    <!-- WinJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/winjs/4.4.0/js/base.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/winjs/4.4.0/js/ui.min.js"></script>
+    <script src="https://cdn.rawgit.com/winjs/angular-winjs/master/js/angular-winjs.js"></script>
+
+    <script src="js/module/app.js"></script>
+    <script src="js/module/controllers.js"></script>
+    <script src="js/module/services.js"></script>
+
+    <!--<script src="js/helpers/cards.js"></script>-->
+</html>
