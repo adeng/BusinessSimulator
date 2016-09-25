@@ -113,9 +113,19 @@ angular.module('main.controllers', [])
     }
 })
 
-.controller('SalesCtrl', function($scope, $rootScope) {
+.controller('SalesCtrl', function($scope, $rootScope, Sales) {
     // Initialization Code
     $rootScope.title = "Sales";
+
+    $scope.$watch(Sales.getSalesData, function() {
+        var salesInfo = JSON.parse(Sales.getSalesData());
+        $scope.totalCash = salesInfo['totalCash'];
+        $scope.totalCredit = salesInfo['totalCredit'];
+        $scope.monthlyCash = salesInfo['monthlyCash'];
+        $scope.monthlyCredit = salesInfo['monthlyCredit'];
+        $scope.avgCash = salesInfo['avgCash'];
+        $scope.avgCredit = salesInfo['avgCredit'];
+    })
 })
 
 .controller('FinancialsCtrl', function($scope, $rootScope, localStorageService, Accounting) {

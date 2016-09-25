@@ -1,7 +1,29 @@
 <div class="outer-box">
     <div class="inner-box">
-        <h1>Dashboard</h1>
+        <h1>Sales Dashboard</h1>
     </div>
     <div class="gradient-box">
+    </div>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Total Sales Information</h2>
+            <p>Cash Sales: {{formatInt(totalCash)}}</p>
+            <p>Credit Sales: {{formatInt(totalCredit)}}</p>
+        </div>
+        
+        <div class="body-item">
+            <h2>Monthly Sales Information</h2>
+            <p>Cash Sales: {{formatInt(monthlyCash)}}</p>
+            <p>Credit Sales: {{formatInt(monthlyCredit)}}</p>
+        </div>
+        
+        <div class="body-item">
+            <h2>Average Daily Sales Information</h2>
+            <p>Cash Sales: {{formatInt(avgCash)}}</p>
+            <p>Credit Sales: {{formatInt(avgCredit)}}</p>
+        </div>
     </div>
 </div>

@@ -34,7 +34,7 @@ angular.module('main.services', [])
          * @return - {String} The number formatted with parentheses and commas
          */
         formatAccountingInt: function(num) {
-            var str = num.toString();
+            var str = Math.round(num).toString();
             var result = [];
             for(var i = str.length - 1, j = 1; i >= 0; i--, j++) {
                 result.unshift(str[i]);
@@ -187,52 +187,125 @@ angular.module('main.services', [])
         "1": [-30, 90]
     };
 
+    // Constant variables
     var cashSales = 0.9;
-
     var price = 10;
 
+    // These should be stored locally
+    var totalCashSales = 0;
+    var totalCreditSales = 0;
+    var monthlyCashSales = 0;
+    var monthlyCreditSales = 0;
+    
+    /**
+     * Function that calculates the number of units of the given product to be sold based on
+     * the demand equation generated.
+     * 
+     * @author - Albert Deng
+     * @param - {product} The id of the product to calculate units for
+     * @return - {Number} The number of units to be sold
+     */
     function calcUnitsSold(product) {
         return Math.floor(($rootScope.interval/(24 * 60 * 60 * 1000))*(3 - price/30));
+    }
+
+    function updateSalesAmount(cash, credit, endOfMonth, numDays) {
+        if(localStorageService.get('sales') == null) {
+            var a = {
+                'totalCash': 0,
+                'totalCredit': 0,
+                'monthlyCash': 0,
+                'monthlyCredit': 0,
+                'avgCash': 0,
+                'avgCredit': 0
+            };
+            localStorageService.set('sales', JSON.stringify(a));
+        }
+
+        sales = JSON.parse(localStorageService.get('sales'));
+
+        console.log(sales);
+
+        sales['totalCash'] += cash; 
+        sales['totalCredit'] += credit; 
+
+        sales['monthlyCash'] =  endOfMonth ? cash : sales['monthlyCash'] + cash; 
+        sales['monthlyCredit'] = endOfMonth ? credit : sales['monthlyCredit'] + credit; 
+
+        sales['avgCash'] = sales['monthlyCash']/numDays;
+        sales['avgCredit'] = sales['monthlyCredit']/numDays;
+
+        localStorageService.set('sales', JSON.stringify(sales));
     }
 
     /**
      * Process sales for every single product that exists.
      * 
      * @author - Albert Deng
+     * @return - {Array} An array containing the amount of cash and credit sales
      */
     function makeSale() {
         var products = Object.keys(demand);
 
         // Don't sell anything if there's nothing TO sell
         if(Inventory.getInventoryUnits() == 0)
-            return;
+            return [0, 0];
+
+        var cashSalesValue = 0;
+        var creditSalesValue = 0;
 
         for(var i = 0; i < products; i++) {
             var units = calcUnitsSold(products[i]);
             var salesInfo = Inventory.sellInventory(units);
             var value = salesInfo[1] * price;
+            cashSalesValue += Math.round(value * cashSales);
+            creditSalesValue += (value - Math.round(value * cashSales));
 
             // Make journal entry
             Accounting.makeJournalEntry([
                 // Debit Cash
-                [1001, Math.round(value * cashSales)],
+                [1001, cashSalesValue],
                 // Debit AR
-                [1011, Math.round(value * (1 - cashSales))],
+                [1011, value - cashSalesValue],
                 // Credit revenue
                 [5001, -1 * value]
             ]);
-
         }
+
+        return [cashSalesValue, creditSalesValue];
     }
 
+    // Scheduled function
     $interval(function() {
+        // If we are at the beginning of a day and time is running
         if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
-            makeSale();
+            var salesInfo = makeSale();
+            updateSalesAmount(salesInfo[0], salesInfo[1], $rootScope.date.getDate() == 1, $rootScope.date.getDate());
         }
     }, 1000);
 
     return {
-
+        /**
+         * Return total, monthly, and average daily sales information in a string
+         * representation.
+         * 
+         * @author - Albert Deng
+         * @return - {String} A string representation of the sales data object
+         */
+        getSalesData: function() {
+            if(localStorageService.get('sales') == null) {
+                var a = {
+                    'totalCash': 0,
+                    'totalCredit': 0,
+                    'monthlyCash': 0,
+                    'monthlyCredit': 0,
+                    'avgCash': 0,
+                    'avgCredit': 0
+                };
+                localStorageService.set('sales', JSON.stringify(a));
+            }
+            return localStorageService.get('sales');
+        }
     }
 })
 
