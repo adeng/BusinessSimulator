@@ -62,31 +62,33 @@ angular.module('main.services', [])
     }
 })
 
-.factory('Entities', function($rootScope, localStorageService, Accounting, General) {
+.factory('Entities', function($rootScope, localStorageService, Products, Accounting, General) {
     var suppliers = [
         {
             'name': "ACME Supply",
             'products': [
                 {
                     'name': 'Product 1',
-                    'id': '1'
-                },
-                {
-                    'name': 'Product 2',
-                    'id': '2'
+                    'id': '1',
+                    'demand': [-30, 90],
+                    'supply': [1, 0],
+                    // Scale of 0 - 1, 1 being most durable
+                    'durable': 0.2,
+                    'optimal': [10, 3]
                 }
             ],
             'inventory': {
                 "1": {
-                    'available': 500,
-                    'price': '4',
-                    'dailyProduction': 200
-                },
-                "2": {
-                    'available': 300,
-                    'price': '5',
-                    'dailyProduction': 2
+                    'available': 15,
+                    'price': 8,
+                    'daysToAdj': 5,
+                    'expComp': 0.8,
+                    'dailyProduction': 15,
+                    'outsideConsump': 12
                 }
+            },
+            'history': {
+                "1": []
             }
         }
     ];
@@ -112,6 +114,54 @@ angular.module('main.services', [])
         localStorageService.set('suppliers', JSON.stringify(suppliers));
     }
 
+    function calculateSupplierPrice(product, expComp) {
+        
+    }
+
+    /**
+     * Updates the supplier's production logic on a daily basis. This function
+     * is scheduled in the supplier scheduled processes function.
+     * 
+     * @author - Albert Deng
+     */
+    function updateProduction(supplier) {
+        // For each product
+        for(var i = 0; i < supplier.products.length; i++) {
+            var product = supplier.products[i].id;
+            var inventory = supplier.inventory[product];
+            
+            // Insert new daily transaction
+            if(supplier.history[product].length == 0 || supplier.history[product][supplier.history[product].length - 1].date != $rootScope.date.getTime()) {
+                var transaction = {
+                    'amount': 0,
+                    'date': $rootScope.date.getTime()
+                }
+                supplier.history[product].push(transaction);
+            }
+
+            // Remove old history and stuff
+            while(supplier.history[product].length > inventory.daysToAdj) {
+                supplier.history[product].shift();
+            }
+
+            // Add up historical purchases
+            var avgAmt = 0;
+            for(var j = 0; j < supplier.history[product].length; j++) {
+                avgAmt += supplier.history[product][j].amount;
+            }
+            avgAmt /= inventory.daysToAdj;
+
+            // Adjust daily production values
+            if(supplier.history[product].length >= inventory.daysToAdj) {
+                supplier.inventory[product].dailyProduction += (supplier.inventory[product].outsideConsump + avgAmt < supplier.inventory[product].dailyProduction ? -1 : 1) * Math.ceil(Math.abs((supplier.inventory[product].outsideConsump + avgAmt - supplier.inventory[product].dailyProduction)/inventory.daysToAdj));
+            }
+
+            var consumption = General.getRandomInt(Math.round(supplier.inventory[product].outsideConsump * 0.8), Math.round(supplier.inventory[product].outsideConsump * 1.25));
+            supplier.inventory[product].available -= consumption;
+            console.log(supplier);
+        }
+    }
+
     /**
      * Creates a new supplier object and pushes it to the local variable. Then
      * updates the copy in local storage.
@@ -124,6 +174,11 @@ angular.module('main.services', [])
             'products': products,
             'inventory': inventory
         }
+        var history = {};
+        for(var i = 0; i < products.length; i++) {
+            history[products[i].id] = [];
+        }
+        obj.history = history;
         suppliers.push(obj);
         updateSuppliers();
     }
@@ -140,10 +195,10 @@ angular.module('main.services', [])
             if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
                 // Increase supplier inventory
                 for(var i = 0; i < suppliers.length; i++) {
+                    updateProduction(suppliers[i]);
                     for(var j = 0; j < suppliers[i]['products'].length; j++) {
                         var prodID = suppliers[i]['products'][j]['id'];
                         suppliers[i]['inventory'][prodID]['available'] += suppliers[i]['inventory'][prodID]['dailyProduction'];
-                        console.log(suppliers[i]);
                     }
                 }
                 updateSuppliers();
@@ -173,16 +228,16 @@ angular.module('main.services', [])
          */
         generateSuppliers: function() {
             // Sample product that will be replaced with actual code later
-            var sampleProduct = {
-                'name': 'Product 1',
-                'id': '1'
-            };
+            var sampleProduct = Products.getRandomProduct();
 
             var inventory = {
                 '1': {
-                    'available': 1000,
-                    'price': '7',
-                    'dailyProduction': 50
+                    'available': Math.round(sampleProduct['optimal']/(1-0.8)),
+                    'price': Math.round(sampleProduct['optimal']*(1-0.8)),
+                    'daysToAdj': 5,
+                    'expComp': 0.8,
+                    'dailyProduction': Math.round(sampleProduct['optimal']/(1-0.8)),
+                    'outsideConsump': Math.round(sampleProduct['optimal']*(1/(1-0.8)-1))
                 }
             };
 
@@ -195,8 +250,116 @@ angular.module('main.services', [])
     }
 })
 
-.factory('Products', function() {
+.factory('Products', function($rootScope, localStorageService, General) {
+    var products = [
+        {
+            'name': 'Product 1',
+            'id': '1',
+            'demand': [-30, 90],
+            'supply': [1, 0],
+            // Scale of 0 - 1, 1 being most durable
+            'durable': 0.2,
+            'optimal': supplyDemandIntersect([-30, 90], [1, 0])
+        }
+    ]
 
+    /**
+     * Returns an optimal price and quantity based on a demand and supply function.
+     * 
+     * @author - Albert Deng
+     * @param - {demand} An array of demand function coefficients
+     * @param - {supply} An array of supply function coefficients
+     * @return - {Array} An array containing the optimal price and quantity
+     */
+    function supplyDemandIntersect(demand, supply) {
+        var q = (demand[1] - supply[1])/(supply[0] - demand[0]);
+        var p = supply[0] * q + supply[1];
+
+        return [p, q];
+    }
+
+    /**
+     * Fetches and returns the products currently available. Also updates the localStorage
+     * products object from the local session.
+     * 
+     * @author - Albert Deng
+     * @return - {Array} The array of products
+     */
+    function getProducts() {
+        updateProducts();
+        return products;
+    }
+
+    /**
+     * Updates the localStorage products object from the local session variable.
+     * 
+     * @author - Albert Deng
+     */
+    function updateProducts() {
+        localStorageService.set('products', JSON.stringify(products));
+    }
+
+    /**
+     * Creates a new product object and inserts it into the products array.
+     * 
+     * @author - Albert Deng
+     * @param - {name} The name of the product
+     * @param - {id} The id number of the product
+     * @param - {demand} An array of the demand coefficients for the product
+     * @param - {supply} An array of the supply coefficients for the product
+     */
+    function createProduct(name, id, demand, supply) {
+        var obj = {
+            'name': name,
+            'id': id,
+            'demand': demand,
+            'supply': supply
+        }
+        products.push(obj);
+        updateProducts();
+    }
+
+    return {
+        /**
+         * Returns a random product from the list of products.
+         * 
+         * @author - Albert Deng
+         * @return - {Object} A product object
+         */
+        getRandomProduct: function() {
+            return products[General.getRandomInt(0, products.length - 1)];
+        },
+        /**
+         * Returns the demand function coefficient array for the given product's id.
+         * 
+         * @author - Albert Deng
+         * @return - {Array} An array containing the demand function's coefficients
+         */
+        getProductDemand: function(id) {
+            for(var i = 0; i < products.length; i++) {
+                if(products[i]['id'] == id)
+                    return products[i]['demand'];
+            }
+        },
+        /**
+         * Returns the product object given a certain id.
+         * 
+         * @author - Albert Deng
+         * @return - {Object} The product object
+         */
+        getProduct: function(id) {
+            for(var i = 0; i < products.length; i++) {
+                if(products[i]['id'] == id)
+                    return products[i];
+            }
+        },
+        generateProducts: function() {
+            var numProducts = General.genRandomInt(3, 8);
+            for(var i = 0; i < numProducts; i++) {
+                
+            }
+        }
+    }
 })
 
 .factory('Sales', function($interval, $rootScope, localStorageService, Inventory, Accounting) {

@@ -1,6 +1,6 @@
 angular.module('main.controllers', [])
 
-.controller('GlobalCtrl', function($scope, $rootScope, $interval, Entities, Inventory, Sales, General) {
+.controller('GlobalCtrl', function($scope, $rootScope, $interval, localStorageService, Entities, Inventory, Sales, General) {
     // Disable this on live production
     General.clearAll();
 
@@ -34,6 +34,8 @@ angular.module('main.controllers', [])
             Entities.scheduledProcess();
 
             $rootScope.date.setTime($rootScope.date.getTime() + $rootScope.interval + (newDate.getUTCHours() - oldDate.getUTCHours())*60000);
+
+            localStorageService.set('time', $rootScope.date.getTime());
 
             $rootScope.formattedDate = $rootScope.date.toUTCString();
         }, 1000);
@@ -197,7 +199,6 @@ angular.module('main.controllers', [])
                 temp[parseInt($scope.accounts[i][0])] = [];
             temp[parseInt($scope.accounts[i][0])].push($scope.accounts[i]);
         }
-        console.log(temp);
         
         $scope.sections.assets = temp[1];
         $scope.sections.liabilities = temp[2];
