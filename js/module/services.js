@@ -48,6 +48,16 @@ angular.module('main.services', [])
                 result.push(")");
             }
             return result.join('');
+        },
+        /**
+         * Returns the number of days between two dates.
+         * 
+         * @author - StackOverflow
+         * @return - {Number} The number of days between the two dates
+         */
+        daysBetween: function(firstDate, secondDate) {
+            var oneDay = 24 * 60 * 60 * 1000;
+            return Math.round(Math.abs((firstDate.getTime() - secondDate.getTime())/(oneDay)));
         }
     }
 })
@@ -169,7 +179,23 @@ angular.module('main.services', [])
     }
 })
 
-.factory('Inventory', function(localStorageService, Accounting) {
+.factory('Sales', function($interval, $rootScope, localStorageService, Accounting) {
+
+})
+
+.factory('Inventory', function($interval, $rootScope, localStorageService, General, Accounting) {
+    var contracts = [];
+    
+    $interval(function() {
+        if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
+            for(var i = 0; i < contracts.length; i++) {
+                // Buy inventory on account if date terms are met
+                if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0)
+                    buyInventory(contracts[i][0], contracts[i][1], true);
+            }
+        }
+    }, 1000);
+
     /**
      * Fetches and returns the inventory object from storage.
      * 
@@ -183,6 +209,43 @@ angular.module('main.services', [])
             localStorageService.set('inventory', JSON.stringify(a));
         }
         return JSON.parse(localStorageService.get('inventory'));
+    }
+
+    /**
+     * Insert new inventory object entry into the inventory object. Will then 
+     * calculate and return the inventory value based on the currently selected
+     * inventory costing method.
+     * 
+     * @author - Albert Deng
+     * @param - {units} The number of units of inventory to purchase
+     * @param - {price} The price of the inventory at the time of purchase
+     * @param - {account} Whether the inventory is purchased on account or not
+     * @return - {Number} The value of inventory 
+     */
+    function buyInventory(units, price, account) {
+        account = account == undefined ? true : account;
+
+        var invObj = getInventoryObj();
+        var obj = {
+            'units': units,
+            'cost': price
+        };
+        var value = units * price;
+        invObj.push(obj);
+
+        // Make journal entry
+        // If on account, credit AP, otherwise cash
+        var credit = account ? 2001 : 1001;
+        Accounting.makeJournalEntry([
+            // Debit inventory
+            [1031, value],
+            // Credit cash
+            [credit, -1 * value]
+        ]);
+
+        // Push updated inventory object to storage
+        localStorageService.set('inventory', JSON.stringify(invObj));
+        return calculateInventoryValue();
     }
 
     /**
@@ -214,29 +277,7 @@ angular.module('main.services', [])
          * @return - {Number} The value of inventory 
          */
         buyInventory: function(units, price, account) {
-            account = account == undefined ? true : account;
-
-            var invObj = getInventoryObj();
-            var obj = {
-                'units': units,
-                'cost': price
-            };
-            var value = units * price;
-            invObj.push(obj);
-
-            // Make journal entry
-            // If on account, credit AP, otherwise cash
-            var credit = account ? 2001 : 1001;
-            Accounting.makeJournalEntry([
-                // Debit inventory
-                [1031, value],
-                // Credit cash
-                [credit, -1 * value]
-            ]);
-
-            // Push updated inventory object to storage
-            localStorageService.set('inventory', JSON.stringify(invObj));
-            return calculateInventoryValue();
+            buyInventory(units, price, account);
         },
         /**
          * Returns the calculated value of inventory.
@@ -260,6 +301,12 @@ angular.module('main.services', [])
                 invUnits += invObj[i]['units'];
             }
             return invUnits;
+        },
+        getContracts: function() {
+            return contracts;
+        },
+        makeContract: function(quantity, price, days) {
+            contracts.push([quantity, price, days, $rootScope.date]);
         }
     }
 });

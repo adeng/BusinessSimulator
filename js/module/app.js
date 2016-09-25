@@ -16,6 +16,12 @@
 			controller: 'SourcingCtrl'
 		})
         
+        .state('sales', {
+			url: '/sales',
+			templateUrl: 'templates/sales/index.html',
+			controller: 'SalesCtrl'
+		})
+
         .state('financials', {
 			url: '/financials',
 			templateUrl: 'templates/financials/index.html',

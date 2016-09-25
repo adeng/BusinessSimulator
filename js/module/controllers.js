@@ -36,10 +36,10 @@ angular.module('main.controllers', [])
     }
 
     /* Time Code */
-    var date = new Date("1/1/2000");
-    var interval = (60 * 60 * 1000);
-    var runTime = false;
-    $rootScope.formattedDate = date.toLocaleString();
+    $rootScope.date = new Date("1/1/2000");
+    var interval = (24 * 60 * 60 * 1000);
+    $rootScope.runTime = false;
+    $rootScope.formattedDate = $rootScope.date.toLocaleString();
 
     var stop;
     
@@ -49,11 +49,11 @@ angular.module('main.controllers', [])
      * @author - Albert Deng
      */
     $rootScope.startTime = function() {
-        runTime = true;
+        $rootScope.runTime = true;
         
         stop = $interval(function() {
-            date.setTime(date.getTime() + interval);
-            $rootScope.formattedDate = date.toLocaleString();
+            $rootScope.date.setTime($rootScope.date.getTime() + interval);
+            $rootScope.formattedDate = $rootScope.date.toLocaleString();
         }, 1000);
     }
 
@@ -64,7 +64,7 @@ angular.module('main.controllers', [])
      */
     $rootScope.stopTime = function() {
         $interval.cancel(stop);
-        runTime = false;
+        $rootScope.runTime = false;
         stop = undefined;
     }
 
@@ -92,17 +92,29 @@ angular.module('main.controllers', [])
     Inventory.buyInventory(General.getRandomInt(0, 1000), General.getRandomInt(2, 8));
     $scope.invUnits = Inventory.getInventoryUnits();
     $scope.invValue = Inventory.getInventory();
+    $scope.contracts = Inventory.getContracts();
 
     $scope.buyUnits = function(units, price) {
         Inventory.buyInventory(units, price);
-        
+
         // Update dashboard numbers
         $scope.invUnits = Inventory.getInventoryUnits();
         $scope.invValue = Inventory.getInventory();
     }
+
+    $scope.makeContract = function(units, price, terms) {
+        Inventory.makeContract(units, price, terms);
+        $scope.contracts = Inventory.getContracts();
+    }
+})
+
+.controller('SalesCtrl', function($scope, $rootScope) {
+    // Initialization Code
+    $rootScope.title = "Sales";
 })
 
 .controller('FinancialsCtrl', function($scope, $rootScope, localStorageService, Accounting) {
+    // Initialization Code
     $rootScope.title = "Financials";
     
     Accounting.updateAccounts().then(function(val) {
