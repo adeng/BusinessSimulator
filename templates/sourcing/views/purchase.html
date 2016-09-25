@@ -6,11 +6,22 @@
     </div>
 </div>
 
-<p>Current price: 5</p>
-<button ng-click="buyUnits(100, 5)">Buy 100 units</button>
-
-<h2>Contract Price</h2>
-<p>Current price: 6</p>
-<p>Current quantity: 100</p>
-<p>Terms: Every 15 days</p>
-<button ng-click="makeContract(100, 6, 15)">Buy 100 units</button>
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Market Price</h2>
+            <p>Current price: 5</p>
+            <input type="number" ng-model="purchase.units"></input>
+            <button ng-click="buyUnits(purchase.units, 5)">Buy {{purchase.units}} units</button>
+        </div>
+        
+        <div class="body-item">
+            <h2>Contract Price</h2>
+            <p>Price: 6</p>
+            <p>Quantity: 100</p>
+            <p>Terms: Every 15 days</p>
+            <button ng-click="makeContract(100, 6, 15)">Create contract</button>
+        </div>
+        
+    </div>
+</div>

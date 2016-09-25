@@ -4,37 +4,6 @@ angular.module('main.controllers', [])
     // Disable this on live production
     General.clearAll();
 
-    /* Side Pane Code */
-	$scope.splitViewElement = document.getElementById("splitView");
-    window.onresize = setPane;
-    window.onload = setPane;
-
-    /**
-     * Close the splitview pane.
-     * 
-     * @author - Albert Deng
-     */
-	$scope.hidePane = function() {
-		$scope.splitViewObject.closePane();
-	}
-    
-    /**
-     * Set the document splitview display mode based on the document's width.
-     * 
-     * @author - Albert Deng
-     */
-    function setPane() {
-        document.getElementById("loader").innerHTML = "";
-        document.getElementById("header-container").className = "";
-        var width = window.innerWidth;
-        
-        if( width <= 500 ) {
-            $scope.splitViewObject.closedDisplayMode = WinJS.UI.SplitView.ClosedDisplayMode.none;
-        } else {
-            $scope.splitViewObject.closedDisplayMode = WinJS.UI.SplitView.ClosedDisplayMode.inline;
-        }
-    }
-
     /* Time Code */
     $rootScope.date = new Date("1/1/2000");
     $rootScope.interval = (24 * 60 * 60 * 1000);
@@ -71,6 +40,40 @@ angular.module('main.controllers', [])
         stop = undefined;
     }
 
+    // Start time by default
+    $rootScope.startTime();
+
+    /* Side Pane Code */
+	$scope.splitViewElement = document.getElementById("splitView");
+    window.onresize = setPane;
+    window.onload = setPane;
+
+    /**
+     * Close the splitview pane.
+     * 
+     * @author - Albert Deng
+     */
+	$scope.hidePane = function() {
+		$scope.splitViewObject.closePane();
+	}
+    
+    /**
+     * Set the document splitview display mode based on the document's width.
+     * 
+     * @author - Albert Deng
+     */
+    function setPane() {
+        document.getElementById("loader").innerHTML = "";
+        document.getElementById("header-container").className = "";
+        var width = window.innerWidth;
+        
+        if( width <= 500 ) {
+            $scope.splitViewObject.closedDisplayMode = WinJS.UI.SplitView.ClosedDisplayMode.none;
+        } else {
+            $scope.splitViewObject.closedDisplayMode = WinJS.UI.SplitView.ClosedDisplayMode.inline;
+        }
+    }
+
     /* RootScope Wrappers */
     
     /**
@@ -92,24 +95,45 @@ angular.module('main.controllers', [])
 .controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Sourcing";
+    $scope.purchase = {
+        "units": 0
+    };
     
+    // Watch the dashboard variables for change
     $scope.$watch(Inventory.getInventory, function() {
         $scope.invUnits = Inventory.getInventoryUnits();
         $scope.invValue = Inventory.getInventory();
         $scope.contracts = Inventory.getContracts();
     });
 
+    /**
+     * Buy inventory units using the Inventory factory's function.
+     * 
+     * @author - Albert Deng
+     * @param - {units} The number of units to buy
+     * @param - {price} The price at which to buy the units
+     */
     $scope.buyUnits = function(units, price) {
+        if(units < 0) {
+            alert("Cannot purchase negative units");
+            return;
+        }
         Inventory.buyInventory(units, price);
-
-        // Update dashboard numbers
-        $scope.invUnits = Inventory.getInventoryUnits();
-        $scope.invValue = Inventory.getInventory();
+        alert("Purchased " + units + " units at $" + price);
     }
 
+    /**
+     * Create a contract using the Inventory factory's function.
+     * 
+     * @author - Albert Deng
+     * @param - {units} The number of units to buy
+     * @param - {price} The price at which to buy the units
+     * @param - {terms} The number of days over which to repeat the contract
+     */
     $scope.makeContract = function(units, price, terms) {
         Inventory.makeContract(units, price, terms);
         $scope.contracts = Inventory.getContracts();
+        alert("Contract created");
     }
 })
 
@@ -117,6 +141,7 @@ angular.module('main.controllers', [])
     // Initialization Code
     $rootScope.title = "Sales";
 
+    // Watch the dashboard variables to update
     $scope.$watch(Sales.getSalesData, function() {
         var salesInfo = JSON.parse(Sales.getSalesData());
         $scope.totalCash = salesInfo['totalCash'];
@@ -131,13 +156,31 @@ angular.module('main.controllers', [])
 .controller('FinancialsCtrl', function($scope, $rootScope, localStorageService, Accounting) {
     // Initialization Code
     $rootScope.title = "Financials";
-    
+    $scope.sections = {};
+
     Accounting.updateAccounts().then(function(val) {
         $scope.GL = val;
+        console.log(val, Object.keys(val));
+        $scope.accounts = Object.keys(val);
+        console.log($scope.accounts);
+
+        var temp = [];
+        for(var i = 0; i < $scope.accounts.length; i++) {
+            if(temp[parseInt($scope.accounts[i][0])] == undefined)
+                temp[parseInt($scope.accounts[i][0])] = [];
+            temp[parseInt($scope.accounts[i][0])].push($scope.accounts[i]);
+        }
+        console.log(temp);
+        
+        $scope.sections.assets = temp[1];
+        $scope.sections.liabilities = temp[2];
+        $scope.sections.equity = temp[3];
+        $scope.sections.revenues = temp[5];
+        $scope.sections.expenses = temp[6];
+        $scope.sections.others = temp[8].concat(temp[9]);
     });
 
     $scope.$watch(Accounting.getAccounts, function() {
         $scope.books = JSON.parse(Accounting.getAccounts());
-        $scope.accounts = Object.keys($scope.books);
     });
 });

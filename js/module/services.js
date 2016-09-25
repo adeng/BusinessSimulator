@@ -209,7 +209,17 @@ angular.module('main.services', [])
         return Math.floor(($rootScope.interval/(24 * 60 * 60 * 1000))*(3 - price/30));
     }
 
+    /**
+     * Function that updates the object storing total, monthly, and average sales information.
+     * 
+     * @author - Albert Deng
+     * @param - {cash} The dollar value of cash sales
+     * @param - {credit} The dollar value of credit sales
+     * @param - {endOfMonth} Whether or not a month has passed
+     * @param - {numDays} The number of days since the beginning of the month
+     */
     function updateSalesAmount(cash, credit, endOfMonth, numDays) {
+        // Create the object if it does not already exist
         if(localStorageService.get('sales') == null) {
             var a = {
                 'totalCash': 0,
@@ -224,14 +234,15 @@ angular.module('main.services', [])
 
         sales = JSON.parse(localStorageService.get('sales'));
 
-        console.log(sales);
-
+        // Append cash and credit information
         sales['totalCash'] += cash; 
         sales['totalCredit'] += credit; 
 
+        // Reset cash and credit information at the beginning of a new month
         sales['monthlyCash'] =  endOfMonth ? cash : sales['monthlyCash'] + cash; 
         sales['monthlyCredit'] = endOfMonth ? credit : sales['monthlyCredit'] + credit; 
 
+        // Calculate the average cash and credit sales over the most recent month
         sales['avgCash'] = sales['monthlyCash']/numDays;
         sales['avgCredit'] = sales['monthlyCredit']/numDays;
 
@@ -258,6 +269,8 @@ angular.module('main.services', [])
             var units = calcUnitsSold(products[i]);
             var salesInfo = Inventory.sellInventory(units);
             var value = salesInfo[1] * price;
+
+            // Add the amount of cash and credit sales
             cashSalesValue += Math.round(value * cashSales);
             creditSalesValue += (value - Math.round(value * cashSales));
 
@@ -312,6 +325,7 @@ angular.module('main.services', [])
 .factory('Inventory', function($interval, $rootScope, localStorageService, General, Accounting) {
     var contracts = [];
     
+    // Scheduled function to execute contracts and stuff
     $interval(function() {
         if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
             for(var i = 0; i < contracts.length; i++) {
@@ -476,9 +490,23 @@ angular.module('main.services', [])
             }
             return invUnits;
         },
+        /**
+         * Return the contracts currently in place.
+         * 
+         * @author - Albert Deng
+         * @return - {Array} The contracts currently in place for this business unit
+         */
         getContracts: function() {
             return contracts;
         },
+        /**
+         * Add a new contract to the company.
+         * 
+         * @author - Albert Deng
+         * @param - {quantity} The number of units to purchase
+         * @param - {price} The price at which to buy the units
+         * @param - {days} The number of days which the contract should be repeated
+         */
         makeContract: function(quantity, price, days) {
             contracts.push([quantity, price, days, new Date($rootScope.date.getTime())]);
         }

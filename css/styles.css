@@ -12,6 +12,33 @@ h1 {
     font-weight: 100;
 }
 
+button {
+    background-color: #03A9F4;
+    color: white;
+    margin: 0px;
+    border: 0px;
+    padding: 8px;
+}
+
+input {
+    padding: 8px;
+    border: 0px;
+    background-color: #E6E6E6;
+}
+
+input:hover {
+    background-color: white;
+}
+
+input:active {
+    box-shadow: inset 0 0 0 2px #E6E6E6;
+}
+
+button:hover {
+    background-color: #94DEFE;
+    cursor: pointer;
+}
+
 body {
   padding-bottom: 38px;
   color: #5a5a5a;
@@ -24,6 +51,7 @@ p {
 }
 
 .win-splitview-content {
+    background-color: #E6E6E6;
     overflow: scroll !important;
 }
 
@@ -39,7 +67,6 @@ p {
 -------------------------------------------------- */
 
 .body-content {
-    background-color: #E6E6E6;
     height: 100%;
 }
 
