@@ -1,15 +1,35 @@
 angular.module('main.controllers', [])
 
-.controller('GlobalCtrl', function($scope, $rootScope, $interval) {
+.controller('GlobalCtrl', function($scope, $rootScope, $interval, General) {
     /* Side Pane Code */
 	$scope.splitViewElement = document.getElementById("splitView");
     window.onresize = setPane;
     window.onload = setPane;
 
+    /**
+     * Close the splitview pane.
+     * 
+     * @author - Albert Deng
+     */
 	$scope.hidePane = function() {
 		$scope.splitViewObject.closePane();
 	}
+
+    /**
+     * Rootscope wrapper for General accounting formatting method.
+     * 
+     * @author - Albert Deng
+     * @param - {num} The number to format
+     */
+    $rootScope.formatInt = function(num) {
+        return General.formatAccountingInt(num);
+    }
     
+    /**
+     * Set the document splitview display mode based on the document's width.
+     * 
+     * @author - Albert Deng
+     */
     function setPane() {
         document.getElementById("loader").innerHTML = "";
         document.getElementById("header-container").className = "";
@@ -30,6 +50,11 @@ angular.module('main.controllers', [])
 
     var stop;
     
+    /**
+     * Starts the timer.
+     * 
+     * @author - Albert Deng
+     */
     $rootScope.startTime = function() {
         runTime = true;
         
@@ -39,23 +64,27 @@ angular.module('main.controllers', [])
         }, 1000);
     }
 
+    /**
+     * Stops the timer.
+     * 
+     * @author - Albert Deng
+     */
     $rootScope.stopTime = function() {
         $interval.cancel(stop);
         runTime = false;
         stop = undefined;
     }
-
-    $rootScope.filterDate = function(date) {
-        return date.toLocaleString();
-    }
 })
 
 .controller('HomeCtrl', function($rootScope) {
+    // Initialization Code
     $rootScope.title = "Home";
 })
 
-.controller('SourcingCtrl', function($scope, $rootScope) {
+.controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
+    // Initialization Code
     $rootScope.title = "Sourcing";
-    $scope.units = 0;
-
+    Inventory.buyInventory(General.getRandomInt(0, 1000), General.getRandomInt(2, 8));
+    $scope.invUnits = Inventory.getInventoryUnits();
+    $scope.invValue = Inventory.getInventory();
 });
