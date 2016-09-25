@@ -1,0 +1,32 @@
+<win-pivot class="header-pivot">
+    <win-pivot-item header="'Trial Balance'">
+        <div style="height:47px"></div>
+      <div class="regular-pivot" ng-include="'../templates/financials/views/trialbalance.html'">
+      </div>
+    </win-pivot-item>
+    <win-pivot-item header="'AR Ledger'">
+        <div style="height:47px"></div>
+        <div ng-include="'../templates/sourcing/views/suppliers.html'">
+        </div>
+    </win-pivot-item>
+    <win-pivot-item header="'AP Ledger'">
+        <div style="height:47px"></div>
+        <div ng-include="'../templates/sourcing/views/suppliers.html'">
+        </div>
+    </win-pivot-item>
+    <win-pivot-item header="'Income Statement'">
+        <div style="height:47px"></div>
+        <div ng-include="'../templates/sourcing/views/suppliers.html'">
+        </div>
+    </win-pivot-item>
+    <win-pivot-item header="'Balance Sheet'">
+        <div style="height:47px"></div>
+        <div ng-include="'../templates/sourcing/views/suppliers.html'">
+        </div>
+    </win-pivot-item>
+    <win-pivot-item header="'Statement of Cash Flows'">
+        <div style="height:47px"></div>
+        <div ng-include="'../templates/sourcing/views/suppliers.html'">
+        </div>
+    </win-pivot-item>
+</win-pivot>

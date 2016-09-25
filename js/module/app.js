@@ -15,6 +15,12 @@
 			templateUrl: 'templates/sourcing/index.html',
 			controller: 'SourcingCtrl'
 		})
+        
+        .state('financials', {
+			url: '/financials',
+			templateUrl: 'templates/financials/index.html',
+			controller: 'FinancialsCtrl'
+		})
     })
 
     /* Configure storage module */

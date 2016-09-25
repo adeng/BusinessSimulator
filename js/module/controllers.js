@@ -92,4 +92,16 @@ angular.module('main.controllers', [])
     Inventory.buyInventory(General.getRandomInt(0, 1000), General.getRandomInt(2, 8));
     $scope.invUnits = Inventory.getInventoryUnits();
     $scope.invValue = Inventory.getInventory();
+})
+
+.controller('FinancialsCtrl', function($scope, $rootScope, localStorageService, Accounting) {
+    $rootScope.title = "Financials";
+    
+    Accounting.updateAccounts().then(function(val) {
+        $scope.GL = val;
+    });
+     
+    $scope.books = Accounting.getAccounts();
+    $scope.accounts = Object.keys($scope.books);
+    console.log($scope.accounts);
 });

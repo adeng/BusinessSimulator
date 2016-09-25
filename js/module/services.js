@@ -148,6 +148,23 @@ angular.module('main.services', [])
                     (value > 0) ? addValue(account, -1 * value) : addValue(account, value);
                 }
             }
+        },
+        /**
+         * Fetches and returns the company's general ledger.
+         * 
+         * @author - Albert Deng
+         * @return - {Object} The company's general ledger object
+         */
+        getAccounts: function() {
+            return getBooks();
+        },
+        /**
+         * Update the chart of accounts data.
+         * 
+         * @author - Albert Deng
+         */
+        updateAccounts: function() {
+            return refreshChartOfAccounts();
         }
     }
 })

@@ -1,0 +1,15 @@
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>Trial Balance</h1>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div>
+    <ul>
+        <li ng-repeat="account in accounts">
+            {{GL[account]}}: {{books[account]}}
+        </li>
+    </ul>
+</div>
