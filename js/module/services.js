@@ -150,12 +150,11 @@ angular.module('main.services', [])
                 var value = transactions[i][1];
 
                 // Check if account is debit
-                if(account.toString[0] == "1", "6", "8") {
-                    // Add positive value if debit, add negative if credit
-                    (value > 0) ? addValue(account, value) : addValue(account, -1 * value);
+                if(account.toString()[0] == "1" || account.toString()[0] == "6" || account.toString()[0] == "8") {
+                    addValue(account, value);
                 } else {
                     // Add positive value if credit, add negative if debit
-                    (value > 0) ? addValue(account, -1 * value) : addValue(account, value);
+                    (value < 0) ? addValue(account, -1 * value) : addValue(account, value);
                 }
             }
         },
@@ -179,8 +178,62 @@ angular.module('main.services', [])
     }
 })
 
-.factory('Sales', function($interval, $rootScope, localStorageService, Accounting) {
+.factory('Sales', function($interval, $rootScope, localStorageService, Inventory, Accounting) {
+    var supply = {
 
+    };
+
+    var demand = {
+        "1": [-30, 90]
+    };
+
+    var cashSales = 0.9;
+
+    var price = 10;
+
+    function calcUnitsSold(product) {
+        return Math.floor(($rootScope.interval/(24 * 60 * 60 * 1000))*(3 - price/30));
+    }
+
+    /**
+     * Process sales for every single product that exists.
+     * 
+     * @author - Albert Deng
+     */
+    function makeSale() {
+        var products = Object.keys(demand);
+
+        // Don't sell anything if there's nothing TO sell
+        if(Inventory.getInventoryUnits() == 0)
+            return;
+
+        for(var i = 0; i < products; i++) {
+            var units = calcUnitsSold(products[i]);
+            var salesInfo = Inventory.sellInventory(units);
+            var value = salesInfo[1] * price;
+
+            // Make journal entry
+            Accounting.makeJournalEntry([
+                // Debit Cash
+                [1001, Math.round(value * cashSales)],
+                // Debit AR
+                [1011, Math.round(value * (1 - cashSales))],
+                // Credit revenue
+                [5001, -1 * value]
+            ]);
+
+        }
+    }
+
+    $interval(function() {
+        if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
+            makeSale();
+        }
+    }, 1000);
+
+    return {
+
+    }
 })
 
 .factory('Inventory', function($interval, $rootScope, localStorageService, General, Accounting) {
@@ -190,8 +243,9 @@ angular.module('main.services', [])
         if($rootScope.date.getHours() == 0 && $rootScope.runTime) {
             for(var i = 0; i < contracts.length; i++) {
                 // Buy inventory on account if date terms are met
-                if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0)
+                if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0) {
                     buyInventory(contracts[i][0], contracts[i][1], true);
+                }
             }
         }
     }, 1000);
@@ -280,6 +334,53 @@ angular.module('main.services', [])
             buyInventory(units, price, account);
         },
         /**
+         * Sells inventory using the FIFO method. Will return the Cost of Goods Sold.
+         * If inventory units sold exceed the amount of inventory actually on hand,
+         * will just sell all of it.
+         * 
+         * @warning - rename this to sellInventoryFIFO later
+         * 
+         * @author - Albert Deng
+         * @param - {units} The number of units of inventory to sell
+         * @return - {Array} The calculated Cost of Goods Sold and the number of units actually sold
+         */
+        sellInventory: function(units) {
+            var invObj = getInventoryObj();
+            var remaining = units;
+            var COGS = 0;
+            for(var i = 0; i < invObj.length; ) {
+                if(invObj[i]['units'] > remaining) {
+                    COGS += remaining * invObj[i]['cost'];
+                    invObj[i]['units'] -= remaining;
+                    remaining = 0;
+                    break;
+                } 
+                else if(invObj[i]['units'] == remaining) {
+                    COGS += invObj[i]['units'] * invObj[i]['cost'];
+                    remaining = 0;
+                    invObj.shift();
+                    break;
+                }
+                else {
+                    COGS += invObj[i]['units'] * invObj[i]['cost'];
+                    remaining -= invObj[i]['units'];
+                    invObj.shift();
+                }
+            }
+
+            // Make journal entry
+            Accounting.makeJournalEntry([
+                // Debit COGS
+                [6001, COGS],
+                // Credit inventory
+                [1031, -1 * COGS]
+            ]);
+
+            localStorageService.set('inventory', JSON.stringify(invObj));
+            
+            return [COGS, (units - remaining)];
+        },
+        /**
          * Returns the calculated value of inventory.
          * 
          * @author - Albert Deng
@@ -306,7 +407,7 @@ angular.module('main.services', [])
             return contracts;
         },
         makeContract: function(quantity, price, days) {
-            contracts.push([quantity, price, days, $rootScope.date]);
+            contracts.push([quantity, price, days, new Date($rootScope.date.getTime())]);
         }
     }
 });

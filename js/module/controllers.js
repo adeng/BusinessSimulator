@@ -1,6 +1,6 @@
 angular.module('main.controllers', [])
 
-.controller('GlobalCtrl', function($scope, $rootScope, $interval, General) {
+.controller('GlobalCtrl', function($scope, $rootScope, $interval, Inventory, Sales, General) {
     // Disable this on live production
     General.clearAll();
 
@@ -37,7 +37,7 @@ angular.module('main.controllers', [])
 
     /* Time Code */
     $rootScope.date = new Date("1/1/2000");
-    var interval = (24 * 60 * 60 * 1000);
+    $rootScope.interval = (24 * 60 * 60 * 1000);
     $rootScope.runTime = false;
     $rootScope.formattedDate = $rootScope.date.toLocaleString();
 
@@ -49,10 +49,13 @@ angular.module('main.controllers', [])
      * @author - Albert Deng
      */
     $rootScope.startTime = function() {
+        // Don't start the timer again if it's already running
+        if($rootScope.runTime == true) 
+            return;
         $rootScope.runTime = true;
         
         stop = $interval(function() {
-            $rootScope.date.setTime($rootScope.date.getTime() + interval);
+            $rootScope.date.setTime($rootScope.date.getTime() + $rootScope.interval);
             $rootScope.formattedDate = $rootScope.date.toLocaleString();
         }, 1000);
     }
@@ -89,7 +92,6 @@ angular.module('main.controllers', [])
 .controller('SourcingCtrl', function($scope, $rootScope, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Sourcing";
-    Inventory.buyInventory(General.getRandomInt(0, 1000), General.getRandomInt(2, 8));
     $scope.invUnits = Inventory.getInventoryUnits();
     $scope.invValue = Inventory.getInventory();
     $scope.contracts = Inventory.getContracts();
@@ -122,6 +124,6 @@ angular.module('main.controllers', [])
     });
 
     $scope.books = Accounting.getAccounts();
+    console.log($scope.books);
     $scope.accounts = Object.keys($scope.books);
-    console.log($scope.accounts);
 });
