@@ -3,6 +3,7 @@ angular.module('main.controllers', [])
 .controller('GlobalCtrl', function($scope, $rootScope, $interval, localStorageService, Entities, Inventory, Sales, General) {
     // Disable this on live production
     General.clearAll();
+    Entities.generateSuppliers();
 
     /* Time Code */
     $rootScope.date = new Date("1/1/2000");
@@ -116,13 +117,12 @@ angular.module('main.controllers', [])
     $rootScope.title = "Home";
 })
 
-.controller('SourcingCtrl', function($scope, $rootScope, Entities, Inventory, General) {
+.controller('SourcingCtrl', function($scope, $state, $rootScope, Entities, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Procurement";
     $scope.purchase = {
         "units": 0
     };
-    Entities.generateSuppliers();
     
     // Watch the dashboard variables for change
     $scope.$watch(Inventory.getInventory, function() {
@@ -135,20 +135,8 @@ angular.module('main.controllers', [])
         $scope.suppliers = Entities.getSuppliers();
     });
 
-    /**
-     * Buy inventory units using the Inventory factory's function.
-     * 
-     * @author - Albert Deng
-     * @param - {units} The number of units to buy
-     * @param - {price} The price at which to buy the units
-     */
-    $scope.buyUnits = function(units, price) {
-        if(units < 0) {
-            alert("Cannot purchase negative units");
-            return;
-        }
-        Inventory.buyInventory(units, price);
-        alert("Purchased " + units + " units at $" + price);
+    $scope.openProductPage = function(supplier, product) {
+        $state.go('sourcing.purchase', {supplierid: supplier, productid: product});
     }
 
     /**
@@ -163,6 +151,30 @@ angular.module('main.controllers', [])
         Inventory.makeContract(units, price, terms);
         $scope.contracts = Inventory.getContracts();
         alert("Contract created");
+    }
+})
+
+.controller('SourcingBuyCtrl', function($scope, $state, $rootScope, $stateParams, General, Entities, Products, Inventory) {
+    $scope.supplier = Entities.getSupplier($stateParams.supplierid);
+    $scope.product = Products.getProduct($stateParams.productid);
+
+    $scope.purchase = {};
+    $scope.purchase.quantity = 0;
+    
+    $scope.buyInventory = function(units) {
+        // This logic will have to be updated in the future
+        $scope.supplier.loyalty++;
+        
+        if(units > $scope.supplier.inventory[$scope.product.id].available) {
+            alert("Not enough units of inventory to purchase.");
+            return;
+        }
+
+        var price = $scope.supplier.inventory[$scope.product.id].price;
+        Inventory.buyInventory(units, price, $scope.product.id);
+        alert("Purchased " + units + " units at $" + price + " for a total cost of $" + $rootScope.formatInt(price * units));
+
+        $state.go('sourcing');
     }
 })
 

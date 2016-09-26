@@ -15,6 +15,12 @@
 			templateUrl: 'templates/sourcing/index.html',
 			controller: 'SourcingCtrl'
 		})
+
+		.state('purchase', {
+			url: '/sourcing/:supplierid/:productid',
+			templateUrl: 'templates/purchase/index.html',
+			controller: 'SourcingBuyCtrl'
+		})
         
         .state('sales', {
 			url: '/sales',

@@ -137,6 +137,8 @@ angular.module('main.services', [])
 
             var consumption = General.getRandomInt(Math.round(supplier.inventory[product].outsideConsump * 0.8), Math.round(supplier.inventory[product].outsideConsump * 1.25));
             supplier.inventory[product].available -= consumption;
+            if(supplier.inventory[product].available < 0)
+                supplier.inventory[product].available = 0;
         }
     }
 
@@ -146,11 +148,13 @@ angular.module('main.services', [])
      * 
      * @author - Albert Deng
      */
-    function createSupplierObject(name, products, inventory) {
+    function createSupplierObject(name, id, products, inventory) {
         var obj = {
             'name': name,
+            'id': id,
             'products': products,
-            'inventory': inventory
+            'inventory': inventory,
+            'loyalty': 0
         }
         var history = {};
         for(var i = 0; i < products.length; i++) {
@@ -215,6 +219,21 @@ angular.module('main.services', [])
             createSupplierObject(name, products, inventory);
         },
         /**
+         * Searches and returns the suppliers array for a supplier with the given ID.
+         * If the supplier cannot be found, will return -1.
+         * 
+         * @author - Albert Deng
+         * @param - {id} The id to search for
+         * @return - {Object} The supplier object being searched for, or -1 if not found
+         */
+        getSupplier: function(id) {
+            for(var i = 0; i < suppliers.length; i++) {
+                if(suppliers[i]['id'] == id)
+                    return suppliers[i];
+            }
+            return -1;
+        },
+        /**
          * Generates the initial set of suppliers that define the procurement market
          * for this business unit.
          * 
@@ -243,13 +262,13 @@ angular.module('main.services', [])
                         };
                     }
                 }
-                    console.log(productArray);
 
                 productArray.sort( function(a, b) {
                     return parseInt(a['id']) - parseInt(b['id']);
                 });
 
-                createSupplierObject('Supplier ' + General.getRandomInt(100,300), productArray, inventory);
+                var id = General.getRandomInt(100,300);
+                createSupplierObject('Supplier ' + id, id, productArray, inventory);
             }
             updateSuppliers();
         }
@@ -554,16 +573,18 @@ angular.module('main.services', [])
      * @author - Albert Deng
      * @param - {units} The number of units of inventory to purchase
      * @param - {price} The price of the inventory at the time of purchase
+     * @param - {id} The ID of the inventory being purchased
      * @param - {account} Whether the inventory is purchased on account or not
      * @return - {Number} The value of inventory 
      */
-    function buyInventory(units, price, account) {
+    function buyInventory(units, price, id, account) {
         account = account == undefined ? true : account;
 
         var invObj = getInventoryObj();
         var obj = {
             'units': units,
-            'cost': price
+            'cost': price,
+            'type': id
         };
         var value = units * price;
         invObj.push(obj);
