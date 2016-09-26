@@ -215,9 +215,11 @@ angular.module('main.controllers', [])
     $scope.buyInventory = function(units) {
         // This logic will have to be updated in the future
         $scope.supplier.loyalty++;
+
         
-        if(units > $scope.supplier.inventory[$scope.product.id].available) {
+        if(units > $scope.supplier.inventory[$scope.product.id].available || units==undefined) {
             alert("Not enough units of inventory to purchase.");
+            $state.go('sourcing');
             return;
         }
 
