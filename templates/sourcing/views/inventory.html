@@ -1,0 +1,36 @@
+<style>
+</style>
+
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>Inventory Report</h1>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Inventory</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity on Hand</th>
+                        <th>Purchase Cost</th>
+                        <th>Total Dollar Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="product in invTable">
+                        <td>{{getProductName(product.type)}}</td>
+                        <td>{{formatInt(product.units)}}</td>
+                        <td>${{product.cost}}</td>
+                        <td>${{formatInt(product.units * product.cost)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

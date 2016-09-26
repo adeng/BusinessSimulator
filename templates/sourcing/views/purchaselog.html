@@ -1,0 +1,37 @@
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>Purchase Log</h1>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Purchase History</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Supplier</th>
+                        <th>Date of Purchase</th>
+                        <th>Units Purchased</th>
+                        <th>Purchase Cost</th>
+                        <th>Total Dollar Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="purchase in purchaseLog">
+                        <td>{{getProductName(purchase.productid)}}</td>
+                        <td>{{getSupplierName(purchase.supplierid)}}</td>
+                        <td>{{formatDate(purchase.date)}}
+                        <td>{{formatInt(purchase.units)}}</td>
+                        <td>${{purchase.cost}}</td>
+                        <td>${{formatInt(purchase.units * purchase.cost)}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

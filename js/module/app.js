@@ -1,5 +1,16 @@
 (function() {
-	var home = angular.module('main', ['winjs', 'LocalStorageModule', 'ui.router', 'main.controllers', 'main.services'])
+	var home = angular.module('main', [
+		'winjs', 
+		'LocalStorageModule', 
+		'ui.router', 
+		'main.controllers', 
+		'main.accounting',
+		'main.entities',
+		'main.general',
+		'main.inventory',
+		'main.products',
+		'main.sales'
+	])
 	
 	.config(function($stateProvider, $urlRouterProvider, $locationProvider) {
 		$stateProvider
@@ -18,7 +29,7 @@
 
 		.state('purchase', {
 			url: '/sourcing/:supplierid/:productid',
-			templateUrl: 'templates/purchase/index.html',
+			templateUrl: 'templates/processes/purchase.html',
 			controller: 'SourcingBuyCtrl'
 		})
         

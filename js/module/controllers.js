@@ -110,6 +110,18 @@ angular.module('main.controllers', [])
     $rootScope.formatInt = function(num) {
         return General.formatAccountingInt(num);
     }
+
+    /**
+     * Function to format the given UNIX time number to a date string.
+     * 
+     * @author - Albert Deng
+     * @param - {date} The UNIX time to format
+     * @return - {String} A string representation of the date
+     */
+    $rootScope.formatDate = function(date) {
+        var d = new Date(date);
+        return d.toUTCString();
+    }
 })
 
 .controller('HomeCtrl', function($rootScope) {
@@ -117,26 +129,63 @@ angular.module('main.controllers', [])
     $rootScope.title = "Home";
 })
 
-.controller('SourcingCtrl', function($scope, $state, $rootScope, Entities, Inventory, General) {
+.controller('SourcingCtrl', function($scope, $state, $rootScope, Entities, Products, Inventory, General) {
     // Initialization Code
     $rootScope.title = "Procurement";
     $scope.purchase = {
         "units": 0
     };
+
+    $scope.purchaseLog = Inventory.getPurchaseLog();
     
     // Watch the dashboard variables for change
     $scope.$watch(Inventory.getInventory, function() {
         $scope.invUnits = Inventory.getInventoryUnits();
         $scope.invValue = Inventory.getInventory();
         $scope.contracts = Inventory.getContracts();
+        $scope.invTable = Inventory.getInventoryObject();
     });
 
+    // Update the suppliers and their ticking information
     $scope.$watch(Entities.getSuppliers, function() {
         $scope.suppliers = Entities.getSuppliers();
     });
 
+    $scope.$watch(Inventory.getPurchaseLog, function() {
+        $scope.purchaseLog = Inventory.getPurchaseLog();
+    })
+
+    /**
+     * Navigates to the purchase page.
+     * 
+     * @author - Albert Deng
+     */
     $scope.openProductPage = function(supplier, product) {
         $state.go('sourcing.purchase', {supplierid: supplier, productid: product});
+    }
+
+    /**
+     * A scope wrapper for the getProduct service function. Returns the given
+     * product's name, given its ID.
+     * 
+     * @author - Albert Deng
+     * @param - {id} The ID of the product to search for
+     * @return - {String} The product name
+     */
+    $scope.getProductName = function(id) {
+        return Products.getProduct(id).name;
+    }
+
+    /**
+     * A scope wrapper for the getSupplier service function. Returns the given
+     * supplier's name, given its ID.
+     * 
+     * @author - Albert Deng
+     * @param - {id} The ID of the supplier to search for
+     * @return - {String} The supplier name
+     */
+    $scope.getSupplierName = function(id) {
+        return Entities.getSupplier(id).name;
     }
 
     /**
@@ -155,9 +204,11 @@ angular.module('main.controllers', [])
 })
 
 .controller('SourcingBuyCtrl', function($scope, $state, $rootScope, $stateParams, General, Entities, Products, Inventory) {
+    // Fetch the product and supplier IDs from the URL
     $scope.supplier = Entities.getSupplier($stateParams.supplierid);
     $scope.product = Products.getProduct($stateParams.productid);
 
+    // Object to store the value from the purchase input box
     $scope.purchase = {};
     $scope.purchase.quantity = 0;
     
@@ -170,8 +221,11 @@ angular.module('main.controllers', [])
             return;
         }
 
+        // Call backend service functions
         var price = $scope.supplier.inventory[$scope.product.id].price;
-        Inventory.buyInventory(units, price, $scope.product.id);
+        Inventory.buyInventory(units, price, $scope.product.id, $scope.supplier.id);
+        Entities.buyFromSupplier($scope.supplier.id, $scope.product.id, units);
+
         alert("Purchased " + units + " units at $" + price + " for a total cost of $" + $rootScope.formatInt(price * units));
 
         $state.go('sourcing');
@@ -201,9 +255,7 @@ angular.module('main.controllers', [])
 
     Accounting.updateAccounts().then(function(val) {
         $scope.GL = val;
-        console.log(val, Object.keys(val));
         $scope.accounts = Object.keys(val);
-        console.log($scope.accounts);
 
         var temp = [];
         for(var i = 0; i < $scope.accounts.length; i++) {
