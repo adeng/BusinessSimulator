@@ -29,6 +29,7 @@ angular.module('main.entities', [])
      * 110% of the initial price.
      * 
      * @author - Albert Deng
+     * @param - {price} A ballpark estimate of the price
      * @return - {Number} A randomly generated supplier price
      */
     function calculateSupplierPrice(price) {
@@ -40,6 +41,7 @@ angular.module('main.entities', [])
      * is scheduled in the supplier scheduled processes function.
      * 
      * @author - Albert Deng
+     * @param - {supplier} The supplier to update production for
      */
     function updateProduction(supplier) {
         // For each product
@@ -85,6 +87,10 @@ angular.module('main.entities', [])
      * updates the copy in local storage.
      * 
      * @author - Albert Deng
+     * @param - {name} The name of the supplier
+     * @param - {id} The ID of the supplier
+     * @param - {products} An array of product objects that the supplier carries
+     * @param - {inventory} An object containing the supplier's inventory parameters
      */
     function createSupplierObject(name, id, products, inventory) {
         var obj = {
@@ -110,6 +116,7 @@ angular.module('main.entities', [])
      * @author - Albert Deng
      * @param - {product} The product to check for
      * @param - {arr} The array of products to check against
+     * @return - {Boolean} Whether or not the product exists in the array
      */
     function productExistsInArr(product, arr) {
         for(var i = 0; i < arr.length; i++) {
@@ -140,10 +147,14 @@ angular.module('main.entities', [])
                 updateSuppliers();
             }
         },
+        generatePurchaseContract: function() {
+
+        },
         /**
          * Returns the suppliers object.
          * 
          * @author - Albert Deng
+         * @return - {Array} An array of suppliers objects
          */
         getSuppliers: function() {
             return getSuppliers();
@@ -152,6 +163,9 @@ angular.module('main.entities', [])
          * Creates a new supplier object using local code.
          * 
          * @author - Albert Deng
+         * @param - {name} The name of the supplier
+         * @param - {products} The products that the supplier will sell
+         * @param - {inventory} The supplier's parameters for the products
          */
         createSupplier: function(name, products, inventory) {
             createSupplierObject(name, products, inventory);

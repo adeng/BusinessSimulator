@@ -47,6 +47,7 @@ angular.module('main.products', [])
      * @param - {id} The id number of the product
      * @param - {demand} An array of the demand coefficients for the product
      * @param - {supply} An array of the supply coefficients for the product
+     * @param - {durable} A fraction between 0 - 1 indicating how durable the product is
      */
     function createProduct(name, id, demand, supply, durable) {
         var obj = {
@@ -75,6 +76,7 @@ angular.module('main.products', [])
          * Returns the demand function coefficient array for the given product's id.
          * 
          * @author - Albert Deng
+         * @param - {id} The ID of the product to fetch
          * @return - {Array} An array containing the demand function's coefficients
          */
         getProductDemand: function(id) {
@@ -87,6 +89,7 @@ angular.module('main.products', [])
          * Returns the product object given a certain id.
          * 
          * @author - Albert Deng
+         * @param - {id} The ID of the product to fetch
          * @return - {Object} The product object
          */
         getProduct: function(id) {
