@@ -30,5 +30,10 @@
             <p>Units: {{purchase.quantity}}</p>
             <p>Cost: {{formatInt(purchase.quantity * supplier.inventory[product.id].price)}}</p>
         </div>
+        <div class="body-item" ng-if="supplier.contracts[product.id] != undefined">
+            <h2>Purchase Contract</h2>
+            <p>Purchase {{supplier.contracts[product.id].units}} units at ${{supplier.contracts[product.id].price}} every {{supplier.contracts[product.id].terms}} days</p>
+            <button type="button" ng-click="buyContract(supplier.contracts[product.id])">Sign Contract</button>
+        </div>
     </div>
 </div>

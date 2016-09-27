@@ -211,17 +211,40 @@ angular.module('main.controllers', [])
     // Object to store the value from the purchase input box
     $scope.purchase = {};
     $scope.purchase.quantity = 0;
+
+    /**
+     * Creates a contract object for a recurring purchase.
+     * 
+     * @author - Albert Deng
+     * @param - {contract} The object containing the contract terms
+     */
+    $scope.buyContract = function(contract) {
+        Inventory.makeContract(contract.units, contract.price, $scope.product.id, $scope.supplier.id, contract.terms);
+        alert("Contract signed");
+        
+        $state.go('sourcing');
+    }
     
+    /**
+     * Purchases inventory if the number of units in the contract does not exceed the
+     * total number of units available for sale. Will also calculate and increase the 
+     * supplier's loyalty value and navigate back to the Procurement page.
+     * 
+     * @author - Albert Deng
+     * @param - {units} The number of units to purchase 
+     */
     $scope.buyInventory = function(units) {
         // This logic will have to be updated in the future
         $scope.supplier.loyalty++;
 
-        
-        if(units > $scope.supplier.inventory[$scope.product.id].available || units==undefined) {
+        if(units > $scope.supplier.inventory[$scope.product.id].available || units == undefined) {
             alert("Not enough units of inventory to purchase.");
             $state.go('sourcing');
             return;
         }
+
+        // Calculate loyalty based on a fraction of the units purchased
+        $scope.supplier.loyalty += 2 * (units / $scope.supplier.inventory[$scope.product.id].available);
 
         // Call backend service functions
         var price = $scope.supplier.inventory[$scope.product.id].price;

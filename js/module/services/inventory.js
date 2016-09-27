@@ -1,6 +1,6 @@
 angular.module('main.inventory', [])
 
-.factory('Inventory', function($interval, $rootScope, localStorageService, General, Accounting) {
+.factory('Inventory', function($interval, $rootScope, localStorageService, Entities, General, Accounting) {
     var contracts = [];
     
     var purchaseLog = [];
@@ -111,8 +111,11 @@ angular.module('main.inventory', [])
             if($rootScope.date.getUTCHours() == 0 && $rootScope.runTime) {
                 for(var i = 0; i < contracts.length; i++) {
                     // Buy inventory on account if date terms are met
-                    if(General.daysBetween($rootScope.date, contracts[i][3]) % contracts[i][2] == 0) {
-                        buyInventory(contracts[i][0], contracts[i][1], true);
+                    if(General.daysBetween($rootScope.date, contracts[i][5]) % contracts[i][4] == 0) {
+                        addPurchase(contracts[i][0], contracts[i][1], contracts[i][2], contracts[i][3]);
+                        buyInventory(contracts[i][0], contracts[i][1], contracts[i][2], true);
+
+                        Entities.addLoyalty(contracts[i][3], 1);
                     }
                 }
             }
@@ -254,10 +257,12 @@ angular.module('main.inventory', [])
          * @author - Albert Deng
          * @param - {quantity} The number of units to purchase
          * @param - {price} The price at which to buy the units
+         * @param - {id} The ID of the product being purchased
+         * @param - {supplierid} The ID of the supplier the contract was made with
          * @param - {days} The number of days which the contract should be repeated
          */
-        makeContract: function(quantity, price, days) {
-            contracts.push([quantity, price, days, new Date($rootScope.date.getTime())]);
+        makeContract: function(quantity, price, id, supplierid, days) {
+            contracts.push([quantity, price, id, supplierid, days, new Date($rootScope.date.getTime())]);
         }
     }
 });

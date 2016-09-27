@@ -25,6 +25,19 @@ angular.module('main.entities', [])
     }
 
     /**
+     * Given a supplier's loyalty value, calculates and returns the supplier's 
+     * discount for buyers. Calculates on a step basis from 0 - 20% based on steps of 5,
+     * maxing at 20%. These discounts are applied to purchase contracts.
+     * 
+     * @author - Albert Deng
+     * @param - {loyalty} The supplier's numerical loyalty value
+     * @return - {Number} A discount percentage to apply to purchase contracts
+     */
+    function calculateLoyaltyDiscount(loyalty) {
+        return Math.round(Math.min(40, loyalty)/10)*0.05;
+    }
+
+    /**
      * Calculates a random supplier price ranging from 75% of the initial price to
      * 110% of the initial price.
      * 
@@ -79,6 +92,10 @@ angular.module('main.entities', [])
             supplier.inventory[product].available -= consumption;
             if(supplier.inventory[product].available < 0)
                 supplier.inventory[product].available = 0;
+
+            // Add in loyalty decay
+            supplier.loyalty -= 0.01;
+            supplier.loyalty = Math.max(0, supplier.loyalty);
         }
     }
 
@@ -98,7 +115,8 @@ angular.module('main.entities', [])
             'id': id,
             'products': products,
             'inventory': inventory,
-            'loyalty': 0
+            'loyalty': 0,
+            'contracts': {}
         }
         var history = {};
         for(var i = 0; i < products.length; i++) {
@@ -107,6 +125,32 @@ angular.module('main.entities', [])
         obj.history = history;
         suppliers.push(obj);
         updateSuppliers();
+    }
+
+    /**
+     * Regenerate purchase contracts for the supplier. Has a possibility of not generating
+     * a contract at all. The terms and conditions of the contract are randomly generated.
+     * 
+     * @author - Albert Deng
+     * @param - {supplier} The supplier to generate contracts for
+     */
+    function refreshPurchaseContracts(supplier) {
+        var daysArray = [15, 30, 45];
+        for(var i = 0; i < supplier.products.length; i++) {
+            var products = supplier.products;
+            // For now, generate contract randomly
+            // Insert code to determine whether or not a contract should be made
+            if(Math.random() > 0.5) {
+                supplier.contracts[products[i].id] = {
+                    'units': Math.round(supplier.inventory[products[i].id].available * 0.5),
+                    'price': supplier.inventory[products[i].id].price * Math.round(1 - calculateLoyaltyDiscount(supplier.loyalty)),
+                    'id': products[i].id,
+                    'terms': daysArray[General.getRandomInt(0,2)]
+                }
+            } else {
+                delete supplier.contracts[products[i].id];
+            }
+        }
     }
 
     /**
@@ -143,11 +187,14 @@ angular.module('main.entities', [])
                         var prodID = suppliers[i]['products'][j]['id'];
                         suppliers[i]['inventory'][prodID]['available'] += suppliers[i]['inventory'][prodID]['dailyProduction'];
                     }
+
+                    // Once a week (on Sunday)
+                    if($rootScope.date.getDay() == 0 && $rootScope.runTime) {
+                        refreshPurchaseContracts(suppliers[i]);
+                    }
                 }
                 updateSuppliers();
             }
-        },
-        generatePurchaseContract: function() {
 
         },
         /**
@@ -169,6 +216,21 @@ angular.module('main.entities', [])
          */
         createSupplier: function(name, products, inventory) {
             createSupplierObject(name, products, inventory);
+        },
+        /**
+         * Increases the given supplier's loyalty value by the provided amount.
+         * 
+         * @author - Albert Deng
+         * @param - {supplierid} The ID of the supplier to manipulate
+         * @param - {loyalty} The amount to increase the supplier's loyalty by
+         */
+        addLoyalty: function(supplierid, loyalty) {
+            for(var i = 0; i < suppliers.length; i++) {
+                if(suppliers[i] == supplierid) {
+                    suppliers[i].loyalty += loyalty;
+                    return;
+                }
+            }
         },
         /**
          * Searches and returns the suppliers array for a supplier with the given ID.
@@ -207,6 +269,19 @@ angular.module('main.entities', [])
                     });
                     return;
                 }
+            }
+        },
+        /**
+         * Returns the current loyalty discount calculated for the given supplier.
+         * 
+         * @author - Albert Deng
+         * @param - {supplierid} The ID of the supplier to check
+         * @return - {Number} The loyalty discount percentage
+         */
+        getCurrentDiscount: function(supplierid) {
+            for(var i = 0; i < suppliers.length; i++) {
+                if(suppliers[i]['id'] == id)
+                    return calculateLoyaltyDiscount(suppliers[i].loyalty);
             }
         },
         /**
