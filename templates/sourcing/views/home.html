@@ -1,26 +1,4 @@
 <style>
-    .body-content {
-        height: 100%;
-    }
-
-    .body-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .body-item {
-        flex-grow: 1;
-        flex-basis: 350px;
-        padding: 20px;
-        margin: 10px;
-        background-color: white;
-    }
-
-    .body-item:hover {
-        box-shadow: inset 0px 0px 0 2px #9E9E9E;
-        transition: box-shadow 0.2s;
-    }
 </style>
 
 <div class="outer-box">
@@ -40,9 +18,9 @@
         </div>
         
         <div class="body-item">
-        </div>
-        
-        <div class="body-item">
+            <h2>Contracts</h2>
+            <p ng-if="contracts.length == 0">No contracts in place</p>
+            <p ng-repeat="contract in contracts">{{contract[0]}} units at ${{contract[1]}} every {{contract[4]}} days</p>
         </div>
     </div>
 </div>

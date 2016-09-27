@@ -1,0 +1,24 @@
+<style>
+</style>
+
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>Dashboard</h1>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item" ng-repeat="supplier in suppliers">
+            <h2>{{supplier.name}}</h2>
+            <div class="body-subitem" ng-repeat="product in supplier.products">
+                <h3>{{product.name}}</h3>
+                <button type="button" ui-sref='purchase({supplierid: supplier.id, productid: product.id})'>Buy {{product.name}}</button>
+                <p>Available: {{formatInt(supplier.inventory[product.id].available)}}</p>
+                <p>Price: {{formatInt(supplier.inventory[product.id].price)}}</p>
+            </div>
+        </div>
+    </div>
+</div>

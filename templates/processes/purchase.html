@@ -1,0 +1,39 @@
+<div class="outer-box">
+    <div class="inner-box">
+        <h1>{{supplier.name}}</h1>
+        <div class="box-card">
+            <h3>{{product.name}}</h3>
+            <p>Units Available for Purchase: {{formatInt(supplier.inventory[product.id].available)}}</p>
+            <p>Price: ${{supplier.inventory[product.id].price}}</p>
+        </div>
+    </div>
+    <div class="gradient-box">
+    </div>
+</div>
+
+<div class="box-card-mobile">
+    <h3>{{product.name}}</h3>
+    <p>Units Available for Purchase: {{formatInt(supplier.inventory[product.id].available)}}</p>
+    <p>Price: ${{supplier.inventory[product.id].price}}</p>
+</div>
+
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Buy Inventory</h2>
+            <p>Quantity</p>
+            <input type="number" min="0" ng-max="{{supplier.inventory[product.id].available}}" ng-model="purchase.quantity" required></input>
+            <button type="button" ng-click="buyInventory(purchase.quantity)">Purchase {{purchase.quantity}} Units</button>
+        </div>
+        <div class="body-item">
+            <h2>Projected Cost</h2>
+            <p>Units: {{purchase.quantity}}</p>
+            <p>Cost: {{formatInt(purchase.quantity * supplier.inventory[product.id].price)}}</p>
+        </div>
+        <div class="body-item" ng-if="supplier.contracts[product.id] != undefined">
+            <h2>Purchase Contract</h2>
+            <p>Purchase {{supplier.contracts[product.id].units}} units at ${{supplier.contracts[product.id].price}} every {{supplier.contracts[product.id].terms}} days</p>
+            <button type="button" ng-click="buyContract(supplier.contracts[product.id])">Sign Contract</button>
+        </div>
+    </div>
+</div>

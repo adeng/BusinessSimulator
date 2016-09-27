@@ -6,10 +6,31 @@
     </div>
 </div>
 
-<div>
-    <ul>
-        <li ng-repeat="account in accounts">
-            {{GL[account]}}: {{books[account]}}
-        </li>
-    </ul>
+<div class="body-content">
+    <div class="body-container">
+        <div class="body-item">
+            <h2>Assets</h2>
+            <p ng-repeat="account in sections.assets">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+        <div class="body-item">
+            <h2>Liabilities</h2>
+            <p ng-repeat="account in sections.liabilities">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+        <div class="body-item">
+            <h2>Equity</h2>
+            <p ng-repeat="account in sections.equity">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+        <div class="body-item">
+            <h2>Revenues</h2>
+            <p ng-repeat="account in sections.revenues">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+        <div class="body-item">
+            <h2>Expenses</h2>
+            <p ng-repeat="account in sections.expenses">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+        <div class="body-item">
+            <h2>Others</h2>
+            <p ng-repeat="account in sections.others">{{GL[account]}}: <span ng-if="books[account] != undefined">{{formatInt(books[account])}}</span><span ng-if="books[account] == undefined">0</span></p> 
+        </div>
+    </div>
 </div>

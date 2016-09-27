@@ -12,6 +12,33 @@ h1 {
     font-weight: 100;
 }
 
+button {
+    background-color: #03A9F4;
+    color: white;
+    margin: 0px;
+    border: 0px;
+    padding: 8px;
+}
+
+input {
+    padding: 8px;
+    border: 0px;
+    background-color: #E6E6E6;
+}
+
+input:hover {
+    background-color: white;
+}
+
+input:active {
+    box-shadow: inset 0 0 0 2px #E6E6E6;
+}
+
+button:hover {
+    background-color: #94DEFE;
+    cursor: pointer;
+}
+
 body {
   padding-bottom: 38px;
   color: #5a5a5a;
@@ -24,6 +51,7 @@ p {
 }
 
 .win-splitview-content {
+    background-color: #E6E6E6;
     overflow: scroll !important;
 }
 
@@ -39,7 +67,50 @@ p {
 -------------------------------------------------- */
 
 .body-content {
-    background-color: #E6E6E6;
+    height: 100%;
+}
+
+.body-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.body-item {
+    flex-grow: 1;
+    flex-basis: 350px;
+    padding: 20px;
+    margin: 10px;
+    background-color: white;
+}
+
+.body-subitem {
+    background-color: #E9E9E9;
+    padding: 10px;
+    flex-grow: 1;
+    flex-basis: 100px;
+    margin: 5px;
+}
+
+.body-subitem p {
+    margin: 0px;
+}
+
+.body-subitem h3 {
+    margin: 5px 0 10px 0;
+}
+
+.body-subitem button {
+    float: right;
+}
+
+.body-item table {
+    width: 100%;
+}
+
+.body-item:hover {
+    box-shadow: inset 0px 0px 0 2px #9E9E9E;
+    transition: box-shadow 0.2s;
 }
 
 .table {
@@ -278,6 +349,71 @@ hr {
 
 /* NAVBAR
 -------------------------------------------------- */
+.win-toolbar .win-toolbar-actionarea {
+    background-color: #F2F2F2 !important;
+}
+
+div.win-command {
+    left: 0px;
+    position: absolute !important;
+}
+
+div.win-command ~ .win-command {
+    position: relative !important;
+}
+
+div.win-command {
+    padding: 0px !important;
+}
+
+div.win-command h4 {
+    font-size: medium;
+}
+
+div.win-command p {
+    padding: 0 10px 0 10px;
+}
+
+span.win-commandimage {
+    background-size: cover;
+    /*background-position: 7px;*/
+    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAA6klEQVR4Xu3YwRGDQBADQUiYYEjYfvqg/GN4XF07ANUy7ErC+7b4b1/8+TcAbMDiBJzA4gvABJ2AE1icgBOoF+A8z8+oeRzHI8i13v15Hw33D149cK0HwI2ADeABMYH6Zms9HsADrgSYYGwBW32ztR4P4AE84EKACTLBmEDt2rWeFJACUkAKjATEYBwCvgXq2Kr1xKAYFINiUAwOBPQAPSAmUOd2racH6AF6gB6gB+gBPwKKUFwD/CFSF5da7/UiVG/U23q5B7w9cK0PQE10Nj0bMNsbq+e1ATXR2fRswGxvrJ7XBtREZ9P7AsxdQFCHwiMwAAAAAElFTkSuQmCC) !important;
+}
+
+span.win-commandimage:hover {
+    background-size: cover;
+    cursor: pointer;
+    /*background-position: 7px !important;*/
+}
+
+button[aria-checked=true].win-command:before, .win-menu-containsflyoutcommand button.win-command-flyout-activated:before {
+    background-color: #388E3C !important;
+    border-color: #388E3C !important;
+}
+
+.win-commandingsurface-content, .win-commandingsurface-actionarea, .win-toolbar-actionarea {
+    height: 38px !important;
+}
+
+button.win-command {
+    padding-left: 7px !important;
+    height: 38px !important;
+    min-height: 0px !important;
+    margin-right: 24px !important;
+}
+
+button.win-command:hover {
+    background-position: 7px !important;
+}
+
+hr.win-disposable {
+    height: 28px !important;
+    margin: 5px !important;
+}
+
+.win-commandicon {
+    margin: 0px !important;
+}
 
 .navbar-selected {
     box-shadow: inset 5px 0 0 0 #4CAF50;
