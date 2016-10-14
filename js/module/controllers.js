@@ -122,6 +122,14 @@ angular.module('main.controllers', [])
         var d = new Date(date);
         return d.toUTCString();
     }
+
+    $rootScope.time_toggler = function(event) {
+      if (event.keyCode == 32)  {
+            $rootScope.toggleTime();
+           
+        }
+    }
+
 })
 
 .controller('HomeCtrl', function($rootScope) {
